@@ -76,7 +76,7 @@ public class DungeonManager : MonoBehaviour {
       gridPositions.Add(ePath.position, TileType.empty);
       int adjacenTileCount = ePath.adjacentPathTiles.Count;
       int randomIndex = Random.Range(0, adjacenTileCount);
-      Vector2 nextEpathPos;
+      Vector2 nextEpathPos = new Vector2  (0,0);
       if(adjacenTileCount > 0) {
         nextEpathPos = ePath.adjacentPathTiles[randomIndex];
       }
