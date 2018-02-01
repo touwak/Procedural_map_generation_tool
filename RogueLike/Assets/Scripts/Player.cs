@@ -9,16 +9,20 @@ public class Player : MovingObject
 	private Animator animator;					//Used to store a reference to the Player's animator component.
 	private int health;             //Used to store player health points total during level.
   private static Vector2 position;
+  public bool onWorldBoard;
+  public bool dungeonTransition;
 
   protected override void Start ()
 	{
 		animator = GetComponent<Animator>();
 
 		health = GameManager.instance.healthPoints;
-    GameManager.instance.SetPlayerOne(this);
+    //GameManager.instance.SetPlayerOne(this);
     healthText.text = "Health: " + health;
 
-    position.x = position.y = 2;   
+    position.x = position.y = 2;
+    onWorldBoard = true;
+    dungeonTransition = false;
 
     base.Start ();
 	}
@@ -40,11 +44,13 @@ public class Player : MovingObject
 		}
 
 		if(horizontal != 0 || vertical != 0) {
-			canMove = AttemptMove<Wall> (horizontal, vertical);
-      if (canMove) {
-        position.x += horizontal;
-        position.y += vertical;
-        GameManager.instance.updateBoard(horizontal, vertical);
+      if (!dungeonTransition) {
+        canMove = AttemptMove<Wall>(horizontal, vertical);
+        if (canMove && onWorldBoard) {
+          position.x += horizontal;
+          position.y += vertical;
+          GameManager.instance.UpdateBoard(horizontal, vertical);
+        }
       }
 		}
 	}
@@ -78,6 +84,27 @@ public class Player : MovingObject
 
   public Vector2 GetPosition() {
     return position;
+  }
+
+  private void GoDungeonPortal() {
+    if (onWorldBoard) {
+      onWorldBoard = false;
+      GameManager.instance.EnterDungeon();
+      transform.position = DungeonManager.startPos;
+    }
+    else {
+      onWorldBoard = true;
+      GameManager.instance.ExitDungeon();
+      transform.position = position;
+    }
+  }
+
+  private void OnTriggerEnter2D(Collider2D other) {
+    if(other.tag == "Exit") {
+      dungeonTransition = true;
+      Invoke("GoDungeonPortal", 0.5f);
+      Destroy(other.gameObject);
+    }
   }
 }
 

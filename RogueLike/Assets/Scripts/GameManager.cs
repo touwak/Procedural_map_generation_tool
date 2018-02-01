@@ -10,14 +10,15 @@ public class GameManager : MonoBehaviour
 	public int healthPoints = 100;							   
 	public static GameManager instance = null;				
 	[HideInInspector] public bool playersTurn = true;
-  public Player playerOne;
+  
 
   private BoardManager boardScript;         
 	private List<Enemy> enemies;							
-	private bool enemiesMoving;								                                                                                                                                                                                                                                                                                                               
+	private bool enemiesMoving;
+  private DungeonManager dungeonScript;
+  private Player playerOne;
 
-
-	void Awake() {
+  void Awake() {
     if (instance == null) {
       instance = this;
     }
@@ -29,6 +30,8 @@ public class GameManager : MonoBehaviour
 		
 		enemies = new List<Enemy>();
     boardScript = GetComponent<BoardManager>();
+    dungeonScript = GetComponent<DungeonManager>();
+    playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
 
     InitGame();
 	}
@@ -76,15 +79,27 @@ public class GameManager : MonoBehaviour
 		enemiesMoving = false;
 	}
 
-  public void updateBoard(int horizontal, int vertical) {
-
+  public void UpdateBoard(int horizontal, int vertical) {
+    boardScript.AddToBoard(horizontal, vertical);
   }
 
-  public void SetPlayerOne(Player player) {
-    playerOne = player;
-  }
+  //public void SetPlayerOne(Player player) {
+  //  playerOne = player;
+  //}
 
   public Player GetPlayerOne() {
     return playerOne;
+  }
+
+  public void EnterDungeon() {
+    dungeonScript.StartDungeon();
+    boardScript.SetDungeonBoard(dungeonScript.gridPositions,
+      dungeonScript.maxBound, dungeonScript.endPos);
+    playerOne.dungeonTransition = false;
+  }
+
+  public void ExitDungeon() {
+    boardScript.SetWorldBoard();
+    playerOne.dungeonTransition = false;
   }
 }
