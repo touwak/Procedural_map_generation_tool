@@ -68,6 +68,7 @@ public class DungeonManager : MonoBehaviour {
     int randomY = Random.Range(0, maxBound + 1);
     PathTile ePath = new PathTile(TileType.essential, 
       new Vector2(0, randomY), minBound, maxBound, gridPositions);
+    startPos = ePath.position;
 
     int boundTracker = 0;
     //when boundTracker is equal to maxBound means that we reach the last column of the right
