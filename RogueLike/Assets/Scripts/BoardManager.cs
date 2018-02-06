@@ -113,7 +113,7 @@ public class BoardManager : MonoBehaviour
     }
 
     //exit tile
-    if(Random.Range(0, 100) == 1) {
+    if(Random.Range(0, 50) == 1) {
       InstanceTiled(tileToAdd, exit, boardHolder);
     }
   }
@@ -128,6 +128,7 @@ public class BoardManager : MonoBehaviour
 
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int bound, Vector2 endpos) {
+
     boardHolder.gameObject.SetActive(false);
     dungeonBoardHolder = new GameObject("Dungeon").transform;
     
@@ -138,10 +139,15 @@ public class BoardManager : MonoBehaviour
     }
 
     //borders
-    for(int x = -1; x < bound + 1; x++) {
-      for(int y = -1; y < bound + 1; y++) {
-        if(!dungeonTiles.ContainsKey(new Vector2(x, y))) {
-          InstanceTiled(new Vector2(x, y), 
+    for (int x = -1; x < bound + 1; x++) {
+      for (int y = -1; y < bound + 1; y++) {
+        if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
+          ( dungeonTiles.ContainsKey(new Vector2(x + 1, y)) ||
+          dungeonTiles.ContainsKey(new Vector2(x, y + 1)) ||
+          dungeonTiles.ContainsKey(new Vector2(x - 1, y)) ||
+          dungeonTiles.ContainsKey(new Vector2(x, y - 1)))) {
+
+          InstanceTiled(new Vector2(x, y),
             outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
         }
       }

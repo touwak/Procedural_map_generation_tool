@@ -83,10 +83,6 @@ public class GameManager : MonoBehaviour
     boardScript.AddToBoard(horizontal, vertical);
   }
 
-  //public void SetPlayerOne(Player player) {
-  //  playerOne = player;
-  //}
-
   public Player GetPlayerOne() {
     return playerOne;
   }

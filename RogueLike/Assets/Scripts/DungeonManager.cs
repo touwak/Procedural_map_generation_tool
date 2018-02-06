@@ -6,7 +6,8 @@ using Random = UnityEngine.Random;
 public enum TileType {
   essential,
   random,
-  empty
+  empty,
+  outerWall
 }
 
 public class DungeonManager : MonoBehaviour {
@@ -23,7 +24,7 @@ public class DungeonManager : MonoBehaviour {
       position = p;
       adjacentPathTiles = GetAdjacentPath(min, max, currentTiles);
     }
-
+    //return a number of adjacent tiles if they are not already exist
     public List<Vector2> GetAdjacentPath(int minBound, int maxBound,
       Dictionary<Vector2, TileType> currentTiles) {
       List<Vector2> pathTiles = new List<Vector2>();
@@ -36,12 +37,13 @@ public class DungeonManager : MonoBehaviour {
         !currentTiles.ContainsKey(new Vector2(position.x + 1, position.y))) {
         pathTiles.Add(new Vector2(position.x + 1, position.y));
       }
-      if (position.y - 1 < maxBound &&
+      if (position.y - 1 > minBound &&
         !currentTiles.ContainsKey(new Vector2(position.x, position.y - 1))) {
         pathTiles.Add(new Vector2(position.x, position.y - 1));
       }
-      if (position.x - 1 < maxBound &&
-        !currentTiles.ContainsKey(new Vector2(position.x - 1, position.y))) {
+      if (position.x - 1 >= minBound &&
+        !currentTiles.ContainsKey(new Vector2(position.x - 1, position.y)) 
+        && type != TileType.essential ) {
         pathTiles.Add(new Vector2(position.x - 1, position.y));
       }
 
@@ -63,8 +65,9 @@ public class DungeonManager : MonoBehaviour {
     BuildRandomPath();
   }
 
-  //TODO Add the possibiliti to switch Start/End points between horizontal and vertical 
+  //TODO Add the possibility to switch Start/End points between horizontal and vertical 
   private void BuildEssentialPath() {
+    //first node
     int randomY = Random.Range(0, maxBound + 1);
     PathTile ePath = new PathTile(TileType.essential, 
       new Vector2(0, randomY), minBound, maxBound, gridPositions);
@@ -74,10 +77,11 @@ public class DungeonManager : MonoBehaviour {
     //when boundTracker is equal to maxBound means that we reach the last column of the right
     while (boundTracker < maxBound) {
       gridPositions.Add(ePath.position, TileType.empty);
-      int adjacenTileCount = ePath.adjacentPathTiles.Count;
-      int randomIndex = Random.Range(0, adjacenTileCount);
-      Vector2 nextEpathPos = new Vector2  (0,0);
-      if(adjacenTileCount > 0) {
+      int adjacentTileCount = ePath.adjacentPathTiles.Count;
+      Vector2 nextEpathPos = new Vector2(0,0);
+
+      if(adjacentTileCount > 0) {
+        int randomIndex = Random.Range(0, adjacentTileCount);
         nextEpathPos = ePath.adjacentPathTiles[randomIndex];
       }
       else {
@@ -103,6 +107,7 @@ public class DungeonManager : MonoBehaviour {
 
   private void BuildRandomPath() {
     List<PathTile> patQueue = new List<PathTile>();
+
     foreach(KeyValuePair<Vector2, TileType> tile in gridPositions) {
       Vector2 tilePos = new Vector2(tile.Key.x, tile.Key.y);
       patQueue.Add(new PathTile(TileType.random, tilePos,
