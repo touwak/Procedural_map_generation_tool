@@ -141,11 +141,8 @@ public class BoardManager : MonoBehaviour
     //borders
     for (int x = -1; x < bound + 1; x++) {
       for (int y = -1; y < bound + 1; y++) {
-        if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
-          ( dungeonTiles.ContainsKey(new Vector2(x + 1, y)) ||
-          dungeonTiles.ContainsKey(new Vector2(x, y + 1)) ||
-          dungeonTiles.ContainsKey(new Vector2(x - 1, y)) ||
-          dungeonTiles.ContainsKey(new Vector2(x, y - 1)))) {
+        if (!dungeonTiles.ContainsKey(new Vector2(x, y)) && 
+            CheckBorders(new Vector2(x, y), dungeonTiles)) {
 
           InstanceTiled(new Vector2(x, y),
             outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
@@ -155,6 +152,52 @@ public class BoardManager : MonoBehaviour
 
     //exit
     InstanceTiled(endpos, exit, dungeonBoardHolder);
+  }
+
+  private bool CheckBorders(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles) {
+    //right
+    if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y))){
+      return true;
+    }
+    //top
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1))) {
+      return true;
+    }
+    //left
+    else if(dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y))) {
+      return true;
+    }
+    //bottom
+    else if(dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+      return true;
+    }
+
+    /*else if (dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) &&
+              dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y))) {
+      return true;
+    }
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1)) &&
+              dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+      return true;
+    }
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y)) &&
+            dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+      return true;
+    }
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) &&
+            dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+      return true;
+    }
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) &&
+            dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1))) {
+      return true;
+    }
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y)) &&
+            dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1))) {
+      return true;
+    }*/
+
+    return false;
   }
 
   public void SetWorldBoard() {

@@ -98,6 +98,9 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Loader.cs" />
     <Compile Include="Assets\Scripts\MovingObject.cs" />
+    <Compile Include="Assets\Scripts\PathFinding\AStar.cs" />
+    <Compile Include="Assets\Scripts\PathFinding\Node.cs" />
+    <Compile Include="Assets\Scripts\PathFinding\PriorityQueue.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\Wall.cs" />
   </ItemGroup>

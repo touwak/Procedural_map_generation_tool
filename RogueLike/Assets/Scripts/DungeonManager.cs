@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
@@ -13,16 +14,24 @@ public enum TileType {
 public class DungeonManager : MonoBehaviour {
 
   [Serializable]
-  public class PathTile {
+  public class PathTile : IComparable {
     public TileType type;
     public Vector2 position;
     public List<Vector2> adjacentPathTiles;
+    public float totalCost; //G
+    public float estimatedCost; //H
+    public PathTile parent;
+    public ArrayList neighbours;
 
-    public PathTile( TileType t, Vector2 p, int min, int max, 
+    public PathTile(TileType t, Vector2 p, int min, int max,
       Dictionary<Vector2, TileType> currentTiles) {
       type = t;
       position = p;
       adjacentPathTiles = GetAdjacentPath(min, max, currentTiles);
+      totalCost = 0.0f;
+      estimatedCost = 0.0f;
+      parent = null;
+      neighbours = new ArrayList();
     }
     //return a number of adjacent tiles if they are not already exist
     public List<Vector2> GetAdjacentPath(int minBound, int maxBound,
@@ -42,16 +51,57 @@ public class DungeonManager : MonoBehaviour {
         pathTiles.Add(new Vector2(position.x, position.y - 1));
       }
       if (position.x - 1 >= minBound &&
-        !currentTiles.ContainsKey(new Vector2(position.x - 1, position.y)) 
-        && type != TileType.essential ) {
+        !currentTiles.ContainsKey(new Vector2(position.x - 1, position.y))
+        && type != TileType.essential) {
         pathTiles.Add(new Vector2(position.x - 1, position.y));
       }
 
       return pathTiles;
     }
+
+    //public ArrayList GetNeighbours(int minBound, int maxBound,
+    //  Dictionary<Vector2, TileType> currentTiles) {
+    //  ArrayList pathTiles = new ArrayList();
+
+    //  if (position.y + 1 < maxBound) {
+    //    pathTiles.Add(new PathTile(TileType.essential, 
+    //      new Vector2(position.x, position.y + 1), minBound, maxBound, currentTiles));
+    //  }
+    //  if (position.x + 1 < maxBound) {
+    //    pathTiles.Add(new PathTile(TileType.essential, 
+    //      new Vector2(position.x + 1, position.y), minBound, maxBound, currentTiles));
+    //  }
+    //  if (position.y - 1 > minBound) {
+    //    pathTiles.Add(new PathTile(TileType.essential, 
+    //      new Vector2(position.x, position.y - 1), minBound, maxBound, currentTiles));
+    //  }
+    //  if (position.x - 1 >= minBound) {
+    //    pathTiles.Add(new PathTile(TileType.essential, 
+    //      new Vector2(position.x - 1, position.y), minBound, maxBound, currentTiles));
+    //  }
+
+    //  return pathTiles;
+    //}
+
+
+    //sort method of Arraylist use CompareTo
+    public int CompareTo(object obj) {
+      PathTile tile = (PathTile)obj;
+
+      //negative value means object comes before this in the sort order
+      if (estimatedCost < tile.estimatedCost) {
+        return -1;
+      }
+      //positive value means object comes after this in the sort order
+      if (estimatedCost > tile.estimatedCost) {
+        return 1;
+      }
+
+      return 0;
+    }
   }
 
-  public Dictionary<Vector2, TileType> gridPositions = 
+  public Dictionary<Vector2, TileType> gridPositions =
     new Dictionary<Vector2, TileType>();
   public int minBound = 0, maxBound;
   public static Vector2 startPos;
@@ -61,7 +111,8 @@ public class DungeonManager : MonoBehaviour {
     gridPositions.Clear();
     maxBound = Random.Range(50, 101);
 
-    BuildEssentialPath();
+    BuildAStarPath();
+    //BuildEssentialPath();
     BuildRandomPath();
   }
 
@@ -69,7 +120,7 @@ public class DungeonManager : MonoBehaviour {
   private void BuildEssentialPath() {
     //first node
     int randomY = Random.Range(0, maxBound + 1);
-    PathTile ePath = new PathTile(TileType.essential, 
+    PathTile ePath = new PathTile(TileType.essential,
       new Vector2(0, randomY), minBound, maxBound, gridPositions);
     startPos = ePath.position;
 
@@ -78,9 +129,9 @@ public class DungeonManager : MonoBehaviour {
     while (boundTracker < maxBound) {
       gridPositions.Add(ePath.position, TileType.empty);
       int adjacentTileCount = ePath.adjacentPathTiles.Count;
-      Vector2 nextEpathPos = new Vector2(0,0);
+      Vector2 nextEpathPos = new Vector2(0, 0);
 
-      if(adjacentTileCount > 0) {
+      if (adjacentTileCount > 0) {
         int randomIndex = Random.Range(0, adjacentTileCount);
         nextEpathPos = ePath.adjacentPathTiles[randomIndex];
       }
@@ -91,8 +142,8 @@ public class DungeonManager : MonoBehaviour {
       PathTile nextEPath = new PathTile(TileType.essential, nextEpathPos,
         minBound, maxBound, gridPositions);
       //to change the start and end logic
-      if(nextEPath.position.x > ePath.position.x ||
-        (nextEPath.position.x == maxBound -1 && Random.Range(0,2) == 1)) {
+      if (nextEPath.position.x > ePath.position.x ||
+        (nextEPath.position.x == maxBound - 1 && Random.Range(0, 2) == 1)) {
         ++boundTracker;
       }
       ePath = nextEPath;
@@ -103,6 +154,116 @@ public class DungeonManager : MonoBehaviour {
     }
 
     endPos = new Vector2(ePath.position.x, ePath.position.y);
+  }
+
+  private void BuildAStarPath() {
+    ArrayList essentialPath = new ArrayList();
+
+    //end node
+    int randomX = Random.Range(0, maxBound + 1);
+    int endRandomY = Random.Range(0, maxBound + 1);
+    PathTile endPath = new PathTile(TileType.essential,
+      new Vector2(randomX, endRandomY), minBound, maxBound, gridPositions);   
+
+    //start node
+    int randomY = Random.Range(0, maxBound + 1);
+    PathTile ePath = new PathTile(TileType.essential,
+      new Vector2(0, randomY), minBound, maxBound, gridPositions);
+    startPos = ePath.position;
+    ePath.totalCost = 0.0f;
+    ePath.estimatedCost = HeuristicEstimateCost(ePath, endPath);
+
+    PriorityQueue closedList = new PriorityQueue();
+    PriorityQueue openList = new PriorityQueue();
+    openList.Push(ePath);
+
+    PathTile currentTile = null;
+    while(openList.Length != 0) {
+      currentTile = openList.First();
+
+      //check if the current node is the goal node
+      if(currentTile.position == endPath.position) {
+        essentialPath = CalculatePath(currentTile);
+      }
+
+      ArrayList neighbourList = GetNeighbours(currentTile.position, minBound, maxBound, gridPositions);
+      for(int i = 0; i < neighbourList.Count; i++) {
+        PathTile neighbourTile = (PathTile)neighbourList[i];
+
+        if (!closedList.Contains(neighbourTile)) {
+          float cost = HeuristicEstimateCost(currentTile, neighbourTile);
+
+          float totalCost = currentTile.totalCost + cost;
+          float neighbourEstCost = HeuristicEstimateCost(neighbourTile, endPath);
+
+          neighbourTile.totalCost = totalCost;
+          neighbourTile.parent = currentTile;
+          neighbourTile.estimatedCost = totalCost + neighbourEstCost;
+
+          if (!openList.Contains(neighbourTile)) {
+            openList.Push(neighbourTile);
+
+          }
+        }
+      }
+
+      //Push the current node to the closedList
+      closedList.Push(currentTile);
+      //and remove it from the openList
+      openList.Remove(currentTile);
+    }
+
+    if(currentTile.position != endPath.position) {
+      //error;
+    }
+
+    //the complete path
+    essentialPath = CalculatePath(currentTile);
+
+    for(int i = 0; i < essentialPath.Count; i++) {
+      gridPositions.Add((Vector2)essentialPath[i] , TileType.essential);
+    }
+
+  }
+
+  private static float HeuristicEstimateCost(PathTile currentTile, PathTile goalTile) {
+    Vector2 cost = currentTile.position - goalTile.position;
+    return cost.magnitude;
+  }
+
+  private static ArrayList CalculatePath(PathTile tile) {
+    ArrayList list = new ArrayList();
+    while (tile != null) {
+      list.Add(tile.position);
+      tile = tile.parent;
+    }
+
+    list.Reverse();
+    return list;
+  }
+
+  public ArrayList GetNeighbours(Vector2 position, int minBound, int maxBound,
+     Dictionary<Vector2, TileType> currentTiles) {
+    ArrayList pathTiles = new ArrayList();
+
+    if (position.y + 1 < maxBound) {
+      pathTiles.Add(new PathTile(TileType.essential,
+        new Vector2(position.x, position.y + 1), minBound, maxBound, currentTiles));
+    }
+    if (position.x + 1 < maxBound) {
+      pathTiles.Add(new PathTile(TileType.essential,
+        new Vector2(position.x + 1, position.y), minBound, maxBound, currentTiles));
+    }
+    if (position.y - 1 > minBound) {
+      pathTiles.Add(new PathTile(TileType.essential,
+        new Vector2(position.x, position.y - 1), minBound, maxBound, currentTiles));
+    }
+    if (position.x - 1 >= minBound) {
+      pathTiles.Add(new PathTile(TileType.essential,
+        new Vector2(position.x - 1, position.y), minBound, maxBound, currentTiles));
+    }
+
+    return pathTiles;
   }
 
   private void BuildRandomPath() {
