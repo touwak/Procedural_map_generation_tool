@@ -11,7 +11,15 @@ public class PriorityQueue {
   }
 
   public bool Contains(object node) {
-    return tiles.Contains(node);
+    DungeonManager.PathTile other = (DungeonManager.PathTile)node;
+
+    for (int i = 0; i < tiles.Count; i++) {
+      DungeonManager.PathTile actual = (DungeonManager.PathTile)tiles[i];
+      if (actual.position == other.position) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public DungeonManager.PathTile First() {

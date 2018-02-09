@@ -28,8 +28,8 @@ public class DungeonManager : MonoBehaviour {
       type = t;
       position = p;
       adjacentPathTiles = GetAdjacentPath(min, max, currentTiles);
-      totalCost = 0.0f;
-      estimatedCost = 0.0f;
+      totalCost = 0;
+      estimatedCost = 0;
       parent = null;
       neighbours = new ArrayList();
     }
@@ -58,31 +58,6 @@ public class DungeonManager : MonoBehaviour {
 
       return pathTiles;
     }
-
-    //public ArrayList GetNeighbours(int minBound, int maxBound,
-    //  Dictionary<Vector2, TileType> currentTiles) {
-    //  ArrayList pathTiles = new ArrayList();
-
-    //  if (position.y + 1 < maxBound) {
-    //    pathTiles.Add(new PathTile(TileType.essential, 
-    //      new Vector2(position.x, position.y + 1), minBound, maxBound, currentTiles));
-    //  }
-    //  if (position.x + 1 < maxBound) {
-    //    pathTiles.Add(new PathTile(TileType.essential, 
-    //      new Vector2(position.x + 1, position.y), minBound, maxBound, currentTiles));
-    //  }
-    //  if (position.y - 1 > minBound) {
-    //    pathTiles.Add(new PathTile(TileType.essential, 
-    //      new Vector2(position.x, position.y - 1), minBound, maxBound, currentTiles));
-    //  }
-    //  if (position.x - 1 >= minBound) {
-    //    pathTiles.Add(new PathTile(TileType.essential, 
-    //      new Vector2(position.x - 1, position.y), minBound, maxBound, currentTiles));
-    //  }
-
-    //  return pathTiles;
-    //}
-
 
     //sort method of Arraylist use CompareTo
     public int CompareTo(object obj) {
@@ -158,113 +133,36 @@ public class DungeonManager : MonoBehaviour {
 
   private void BuildAStarPath() {
     ArrayList essentialPath = new ArrayList();
+    AStar aStar = new AStar();
+
+    //start node
+    int randomY = Random.Range(0, maxBound + 1);
+
+    PathTile startTile = new PathTile(TileType.essential,
+      new Vector2(0, randomY), minBound, maxBound, gridPositions);
+    startPos = startTile.position;
 
     //end node
     int randomX = Random.Range(0, maxBound + 1);
     int endRandomY = Random.Range(0, maxBound + 1);
-    PathTile endPath = new PathTile(TileType.essential,
-      new Vector2(randomX, endRandomY), minBound, maxBound, gridPositions);   
+    
+    PathTile goalTile = new PathTile(TileType.essential,
+      new Vector2(randomX, endRandomY), minBound, maxBound, gridPositions);
 
-    //start node
-    int randomY = Random.Range(0, maxBound + 1);
-    PathTile ePath = new PathTile(TileType.essential,
-      new Vector2(0, randomY), minBound, maxBound, gridPositions);
-    startPos = ePath.position;
-    ePath.totalCost = 0.0f;
-    ePath.estimatedCost = HeuristicEstimateCost(ePath, endPath);
+    essentialPath = aStar.BuildAStarPath(startTile, goalTile, 
+      minBound, maxBound, gridPositions);
 
-    PriorityQueue closedList = new PriorityQueue();
-    PriorityQueue openList = new PriorityQueue();
-    openList.Push(ePath);
-
-    PathTile currentTile = null;
-    while(openList.Length != 0) {
-      currentTile = openList.First();
-
-      //check if the current node is the goal node
-      if(currentTile.position == endPath.position) {
-        essentialPath = CalculatePath(currentTile);
-      }
-
-      ArrayList neighbourList = GetNeighbours(currentTile.position, minBound, maxBound, gridPositions);
-      for(int i = 0; i < neighbourList.Count; i++) {
-        PathTile neighbourTile = (PathTile)neighbourList[i];
-
-        if (!closedList.Contains(neighbourTile)) {
-          float cost = HeuristicEstimateCost(currentTile, neighbourTile);
-
-          float totalCost = currentTile.totalCost + cost;
-          float neighbourEstCost = HeuristicEstimateCost(neighbourTile, endPath);
-
-          neighbourTile.totalCost = totalCost;
-          neighbourTile.parent = currentTile;
-          neighbourTile.estimatedCost = totalCost + neighbourEstCost;
-
-          if (!openList.Contains(neighbourTile)) {
-            openList.Push(neighbourTile);
-
-          }
-        }
-      }
-
-      //Push the current node to the closedList
-      closedList.Push(currentTile);
-      //and remove it from the openList
-      openList.Remove(currentTile);
-    }
-
-    if(currentTile.position != endPath.position) {
-      //error;
-    }
-
-    //the complete path
-    essentialPath = CalculatePath(currentTile);
-
-    for(int i = 0; i < essentialPath.Count; i++) {
+    int totalPath = essentialPath.Count - 1;
+    for (int i = 0; i < totalPath; i++) {
       gridPositions.Add((Vector2)essentialPath[i] , TileType.essential);
     }
 
+    endPos = (Vector2)essentialPath[totalPath];
   }
 
-  private static float HeuristicEstimateCost(PathTile currentTile, PathTile goalTile) {
-    Vector2 cost = currentTile.position - goalTile.position;
-    return cost.magnitude;
-  }
 
-  private static ArrayList CalculatePath(PathTile tile) {
-    ArrayList list = new ArrayList();
-    while (tile != null) {
-      list.Add(tile.position);
-      tile = tile.parent;
-    }
 
-    list.Reverse();
-    return list;
-  }
-
-  public ArrayList GetNeighbours(Vector2 position, int minBound, int maxBound,
-     Dictionary<Vector2, TileType> currentTiles) {
-    ArrayList pathTiles = new ArrayList();
-
-    if (position.y + 1 < maxBound) {
-      pathTiles.Add(new PathTile(TileType.essential,
-        new Vector2(position.x, position.y + 1), minBound, maxBound, currentTiles));
-    }
-    if (position.x + 1 < maxBound) {
-      pathTiles.Add(new PathTile(TileType.essential,
-        new Vector2(position.x + 1, position.y), minBound, maxBound, currentTiles));
-    }
-    if (position.y - 1 > minBound) {
-      pathTiles.Add(new PathTile(TileType.essential,
-        new Vector2(position.x, position.y - 1), minBound, maxBound, currentTiles));
-    }
-    if (position.x - 1 >= minBound) {
-      pathTiles.Add(new PathTile(TileType.essential,
-        new Vector2(position.x - 1, position.y), minBound, maxBound, currentTiles));
-    }
-
-    return pathTiles;
-  }
+  
 
   private void BuildRandomPath() {
     List<PathTile> patQueue = new List<PathTile>();
