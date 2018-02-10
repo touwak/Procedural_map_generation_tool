@@ -12,26 +12,19 @@ public enum TileType {
 }
 
 public class DungeonManager : MonoBehaviour {
+ 
 
   [Serializable]
-  public class PathTile : IComparable {
+  public class PathTile {
     public TileType type;
     public Vector2 position;
     public List<Vector2> adjacentPathTiles;
-    public float totalCost; //G
-    public float estimatedCost; //H
-    public PathTile parent;
-    public ArrayList neighbours;
 
     public PathTile(TileType t, Vector2 p, int min, int max,
       Dictionary<Vector2, TileType> currentTiles) {
       type = t;
       position = p;
       adjacentPathTiles = GetAdjacentPath(min, max, currentTiles);
-      totalCost = 0;
-      estimatedCost = 0;
-      parent = null;
-      neighbours = new ArrayList();
     }
     //return a number of adjacent tiles if they are not already exist
     public List<Vector2> GetAdjacentPath(int minBound, int maxBound,
@@ -58,22 +51,6 @@ public class DungeonManager : MonoBehaviour {
 
       return pathTiles;
     }
-
-    //sort method of Arraylist use CompareTo
-    public int CompareTo(object obj) {
-      PathTile tile = (PathTile)obj;
-
-      //negative value means object comes before this in the sort order
-      if (estimatedCost < tile.estimatedCost) {
-        return -1;
-      }
-      //positive value means object comes after this in the sort order
-      if (estimatedCost > tile.estimatedCost) {
-        return 1;
-      }
-
-      return 0;
-    }
   }
 
   public Dictionary<Vector2, TileType> gridPositions =
@@ -81,13 +58,24 @@ public class DungeonManager : MonoBehaviour {
   public int minBound = 0, maxBound;
   public static Vector2 startPos;
   public Vector2 endPos;
+  public bool seedDungeon = false;
+  private int seed = 0;
 
   public void StartDungeon() {
+    if (seedDungeon) {
+      TextHandle textHandle = new TextHandle();
+      
+      seed = Random.Range(0, 100 + 1);
+      Random.seed = seed;
+      string seedCount = seed.ToString();
+      textHandle.WriteFile("seeds", seedCount);
+    }
+
     gridPositions.Clear();
     maxBound = Random.Range(50, 101);
 
-    BuildAStarPath();
-    //BuildEssentialPath();
+    //BuildAStarPath();
+    BuildEssentialPath();
     BuildRandomPath();
   }
 
@@ -163,9 +151,6 @@ public class DungeonManager : MonoBehaviour {
   }
 
 
-
-  
-
   private void BuildRandomPath() {
     List<PathTile> patQueue = new List<PathTile>();
 
@@ -219,7 +204,7 @@ public class DungeonManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+   
 	}
 	
 	// Update is called once per frame
