@@ -131,6 +131,7 @@ public class DungeonManager : MonoBehaviour {
     endPos = new Vector2(ePath.position.x, ePath.position.y);
   }
 
+  //--------------------------ASTAR------------------------------
   private void BuildAStarPath() {
     ArrayList essentialPath = new ArrayList();
     AStar aStar = new AStar();
@@ -147,17 +148,18 @@ public class DungeonManager : MonoBehaviour {
     int endRandomY = Random.Range(0, maxBound + 1);
     
     PathTile goalTile = new PathTile(TileType.essential,
-      new Vector2(randomX, endRandomY), minBound, maxBound, gridPositions);
+      new Vector2(maxBound, endRandomY), minBound, maxBound, gridPositions);
 
-    essentialPath = aStar.BuildAStarPath(startTile, goalTile, 
-      minBound, maxBound, gridPositions);
+    essentialPath = aStar.BuildAStarPath(startTile.position, goalTile.position, 
+                                          minBound, maxBound);
 
-    int totalPath = essentialPath.Count - 1;
-    for (int i = 0; i < totalPath; i++) {
-      gridPositions.Add((Vector2)essentialPath[i] , TileType.essential);
+    Vector3 auxPos = new Vector3();
+    for (int i = 0; i < essentialPath.Count; i++) {
+      auxPos = (Vector3)essentialPath[i];
+      gridPositions.Add(new Vector2(auxPos.x, auxPos.y), TileType.essential);
     }
 
-    endPos = (Vector2)essentialPath[totalPath];
+    endPos = new Vector2(auxPos.x, auxPos.y);
   }
 
 

@@ -4,38 +4,38 @@ using UnityEngine;
 
 public class PriorityQueue {
 
-  private ArrayList tiles = new ArrayList();
+  private ArrayList nodes = new ArrayList();
 
   public int Length {
-    get{ return tiles.Count; }
+    get{ return nodes.Count; }
   }
 
   public bool Contains(object node) {
-    DungeonManager.PathTile other = (DungeonManager.PathTile)node;
-
-    for (int i = 0; i < tiles.Count; i++) {
-      DungeonManager.PathTile actual = (DungeonManager.PathTile)tiles[i];
-      if (actual.position == other.position) {
+    Node other = (Node)node, current;
+    for(int i = 0; i < nodes.Count; i++) {
+      current = (Node)nodes[i];
+      if(current.position == other.position) {
         return true;
       }
     }
+
     return false;
   }
 
-  public DungeonManager.PathTile First() {
-    if (tiles.Count > 0) {
-      return (DungeonManager.PathTile)tiles[0];
+  public Node First() {
+    if (nodes.Count > 0) {
+      return (Node)nodes[0];
     }
     return null;
   }
 
-  public void Push(DungeonManager.PathTile tile) {
-    tiles.Add(tile);
-    tiles.Sort();
+  public void Push(Node tile) {
+    nodes.Add(tile);
+    nodes.Sort();
   }
 
-  public void Remove(DungeonManager.PathTile tile) {
-    tiles.Remove(tile);
-    tiles.Sort();
+  public void Remove(Node tile) {
+    nodes.Remove(tile);
+    nodes.Sort();
   }
 }
