@@ -11,6 +11,7 @@ public class Player : MovingObject
   private static Vector2 position;
   public bool onWorldBoard;
   public bool dungeonTransition;
+  public static Vector2 lastPosition;
 
   protected override void Start ()
 	{
@@ -47,6 +48,7 @@ public class Player : MovingObject
       if (!dungeonTransition) {
         canMove = AttemptMove<Wall>(horizontal, vertical);
         if (canMove && onWorldBoard) {
+          lastPosition = position;
           position.x += horizontal;
           position.y += vertical;
           GameManager.instance.UpdateBoard(horizontal, vertical);
@@ -95,7 +97,7 @@ public class Player : MovingObject
     else {
       onWorldBoard = true;
       GameManager.instance.ExitDungeon();
-      transform.position = position;
+      transform.position = lastPosition;
     }
   }
 
@@ -103,7 +105,7 @@ public class Player : MovingObject
     if(other.tag == "Exit") {
       dungeonTransition = true;
       Invoke("GoDungeonPortal", 0.5f);
-      Destroy(other.gameObject);
+      //Destroy(other.gameObject);
     }
   }
 }

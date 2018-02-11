@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
 	private bool enemiesMoving;
   private DungeonManager dungeonScript;
   private Player playerOne;
+  private TextHandle textHandle;
 
   void Awake() {
     if (instance == null) {
@@ -32,6 +33,8 @@ public class GameManager : MonoBehaviour
     boardScript = GetComponent<BoardManager>();
     dungeonScript = GetComponent<DungeonManager>();
     playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+    textHandle = new TextHandle();
+    textHandle.ReadFile("seeds");
 
     InitGame();
 	}
@@ -87,8 +90,12 @@ public class GameManager : MonoBehaviour
     return playerOne;
   }
 
+  public TextHandle GetTextHandle() {
+    return textHandle;
+  }
+
   public void EnterDungeon() {
-    dungeonScript.StartDungeon();
+    dungeonScript.StartDungeon(playerOne.GetPosition());
     boardScript.SetDungeonBoard(dungeonScript.gridPositions,
       dungeonScript.maxBound, dungeonScript.endPos);
     playerOne.dungeonTransition = false;

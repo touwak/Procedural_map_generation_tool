@@ -59,16 +59,24 @@ public class DungeonManager : MonoBehaviour {
   public static Vector2 startPos;
   public Vector2 endPos;
   public bool seedDungeon = false;
-  private int seed = 0;
 
-  public void StartDungeon() {
+  //no delete dungeon entrance
+  public void StartDungeon(Vector2 playerPos) {
     if (seedDungeon) {
-      TextHandle textHandle = new TextHandle();
-      
-      seed = Random.Range(0, 100 + 1);
-      Random.seed = seed;
-      string seedCount = seed.ToString();
-      textHandle.WriteFile("seeds", seedCount);
+      TextHandle textHandle = GameManager.instance.GetTextHandle();
+      int seed = textHandle.FindDungeon(playerPos);
+
+      //the dungeon doesn't exist
+      if (seed == -1) {
+        int posX = (int)playerPos.x;
+        int posY = (int)playerPos.y;
+        string pos = posX + "|" + posY + "|";
+        seed = Random.Range(0, 100 + 1);
+
+        string seedCount = pos + seed.ToString() + "|";
+        textHandle.WriteFile("seeds", seedCount);
+      }
+        Random.seed = seed;
     }
 
     gridPositions.Clear();
