@@ -38,13 +38,6 @@ public class GameManager : MonoBehaviour
 
     InitGame();
 	}
-	
-	//This is called each time a scene is loaded.
-	void OnLevelWasLoaded(int index) {
-		//Call InitGame to initialize our level.
-		InitGame();
-	}
-	
 
 	void InitGame()	{
 

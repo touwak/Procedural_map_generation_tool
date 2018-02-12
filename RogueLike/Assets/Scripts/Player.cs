@@ -98,6 +98,7 @@ public class Player : MovingObject
       onWorldBoard = true;
       GameManager.instance.ExitDungeon();
       transform.position = lastPosition;
+      position = lastPosition;
     }
   }
 
