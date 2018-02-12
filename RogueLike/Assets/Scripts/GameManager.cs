@@ -98,4 +98,12 @@ public class GameManager : MonoBehaviour
     boardScript.SetWorldBoard();
     playerOne.dungeonTransition = false;
   }
+
+  public void InstanceTile(Vector2 position, GameObject tile, Transform parent) {
+    GameObject toInstantiate = tile;
+    GameObject instance = Instantiate(toInstantiate,
+      new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
+
+    instance.transform.SetParent(parent);
+  }
 }

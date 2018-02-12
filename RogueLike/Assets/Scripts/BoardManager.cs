@@ -46,7 +46,7 @@ public class BoardManager : MonoBehaviour
     for(int x = 0; x < columns; x++) {
       for(int y = 0; y < rows; y++) {
         gridPositions.Add(new Vector2(x, y), new Vector2(x, y));
-        InstanceTiled(new Vector2(x, y), floorTiles[Random.Range(0, floorTiles.Length)], 
+        GameManager.instance.InstanceTile(new Vector2(x, y), floorTiles[Random.Range(0, floorTiles.Length)], 
           boardHolder);
       }
     }
@@ -102,29 +102,23 @@ public class BoardManager : MonoBehaviour
   private void AddTiles(Vector2 tileToAdd) {
     if (!gridPositions.ContainsKey(tileToAdd)) {
       gridPositions.Add(tileToAdd, tileToAdd);
-      InstanceTiled(tileToAdd, floorTiles[Random.Range(0, floorTiles.Length)],
+      GameManager.instance.InstanceTile(tileToAdd, floorTiles[Random.Range(0, floorTiles.Length)],
         boardHolder);
 
       //choose at random a wall tile to lay
       if(Random.Range(0, 3) == 1) {
-        InstanceTiled(tileToAdd, wallTiles[Random.Range(0, floorTiles.Length)],
+        GameManager.instance.InstanceTile(tileToAdd, wallTiles[Random.Range(0, floorTiles.Length)],
           boardHolder);
       }
     }
 
     //exit tile
     if(Random.Range(0, 50) == 1) {
-      InstanceTiled(tileToAdd, exit, boardHolder);
+      GameManager.instance.InstanceTile(tileToAdd, exit, boardHolder);
     }
   }
 
-  private void InstanceTiled(Vector2 position, GameObject tile, Transform parent) {
-    GameObject toInstantiate = tile;
-    GameObject instance = Instantiate(toInstantiate,
-      new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
-
-    instance.transform.SetParent(parent);
-  }
+  
 
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int bound, Vector2 endpos) {
@@ -134,7 +128,7 @@ public class BoardManager : MonoBehaviour
     
     //floor
     foreach(KeyValuePair<Vector2, TileType> tile in dungeonTiles) {
-      InstanceTiled(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
+      GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
         dungeonBoardHolder);
     }
 
@@ -144,14 +138,14 @@ public class BoardManager : MonoBehaviour
         if (!dungeonTiles.ContainsKey(new Vector2(x, y)) && 
             CheckBorders(new Vector2(x, y), dungeonTiles)) {
 
-          InstanceTiled(new Vector2(x, y),
+          GameManager.instance.InstanceTile(new Vector2(x, y),
             outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
         }
       }
     }
 
     //exit
-    InstanceTiled(endpos, exit, dungeonBoardHolder);
+    GameManager.instance.InstanceTile(endpos, exit, dungeonBoardHolder);
   }
 
   private bool CheckBorders(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles) {
