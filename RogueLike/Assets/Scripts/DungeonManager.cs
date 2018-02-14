@@ -59,6 +59,7 @@ public class DungeonManager : MonoBehaviour {
   public static Vector2 startPos;
   public Vector2 endPos;
   public bool seedDungeon = false;
+  public int chamberSize = 3;
 
   //no delete dungeon entrance
   public void StartDungeon(Vector2 playerPos) {
@@ -158,7 +159,7 @@ public class DungeonManager : MonoBehaviour {
     endPos = new Vector2(auxPos.x, auxPos.y);
   }
 
-
+  //-------------------------RANDOM PATH-------------------------
   private void BuildRandomPath() {
     List<PathTile> patQueue = new List<PathTile>();
 
@@ -194,12 +195,12 @@ public class DungeonManager : MonoBehaviour {
   }
 
   private void BuildRandomChamber(PathTile tile) {
-    int chamberSize = 3, adjacentTileCount = tile.adjacentPathTiles.Count,
+    int size = chamberSize, adjacentTileCount = tile.adjacentPathTiles.Count,
       randomIndex = Random.Range(0, adjacentTileCount);
     Vector2 chamberOrigin = tile.adjacentPathTiles[randomIndex];
 
-    for(int x = (int)chamberOrigin.x; x < chamberOrigin.x + chamberSize; x++) {
-      for(int y = (int)chamberOrigin.y; y < chamberOrigin.y + chamberSize; y++) {
+    for(int x = (int)chamberOrigin.x; x < chamberOrigin.x + size; x++) {
+      for(int y = (int)chamberOrigin.y; y < chamberOrigin.y + size; y++) {
         Vector2 chamberTilePos = new Vector2(x, y);
         if(!gridPositions.ContainsKey(chamberTilePos) && 
           chamberTilePos.x < maxBound && chamberTilePos.x > 0 &&
