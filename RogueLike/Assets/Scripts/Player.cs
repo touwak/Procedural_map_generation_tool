@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class Player : MovingObject
@@ -12,18 +12,22 @@ public class Player : MovingObject
   public bool onWorldBoard;
   public bool dungeonTransition;
   public static Vector2 lastPosition;
+  public Image glove;
+  public Image boot;
+  public int attackMod = 0, defenseMod = 0;
+  private Dictionary<string, Item> inventory;
 
   protected override void Start ()
 	{
 		animator = GetComponent<Animator>();
-
 		health = GameManager.instance.healthPoints;
-    //GameManager.instance.SetPlayerOne(this);
     healthText.text = "Health: " + health;
 
     position.x = position.y = 2;
     onWorldBoard = true;
     dungeonTransition = false;
+
+    inventory = new Dictionary<string, Item>();
 
     base.Start ();
 	}
@@ -46,7 +50,13 @@ public class Player : MovingObject
 
 		if(horizontal != 0 || vertical != 0) {
       if (!dungeonTransition) {
-        canMove = AttemptMove<Wall>(horizontal, vertical);
+        if (onWorldBoard) {
+          canMove = AttemptMove<Wall>(horizontal, vertical);
+        }
+        else {
+          canMove = AttemptMove<Chest>(horizontal, vertical);
+        }
+        
         if (canMove && onWorldBoard) {
           lastPosition = position;
           position.x += horizontal;
@@ -65,8 +75,15 @@ public class Player : MovingObject
 	}
 	
 	protected override void OnCantMove <T> (T component) {
-		Wall hitWall = component as Wall;
-		hitWall.DamageWall (wallDamage);
+    if (typeof(T) == typeof(Wall)){
+      Wall hitWall = component as Wall;
+      hitWall.DamageWall(wallDamage);
+    }
+    else if(typeof(T) == typeof(Chest)) {
+      Chest hitChest = component as Chest;
+      hitChest.Open();
+    }
+
 		animator.SetTrigger ("playerChop");
 	}
 	
@@ -106,8 +123,47 @@ public class Player : MovingObject
     if(other.tag == "Exit") {
       dungeonTransition = true;
       Invoke("GoDungeonPortal", 0.5f);
-      //Destroy(other.gameObject);
     }
+    else if(other.tag == "Item") {
+      UpdateInvetory(other);
+      Destroy(other.gameObject);
+    }
+  }
+
+  private void UpdateInvetory(Collider2D item) {
+    Item itemData = item.GetComponent<Item>();
+
+    switch (itemData.type) {
+      case itemType.gloove:
+        if (!inventory.ContainsKey("glove")) {
+          inventory.Add("glove", itemData);
+        }
+        else {
+          inventory["glove"] = itemData;
+        }
+
+        glove.color = itemData.level;
+        break;
+      case itemType.boot:
+        if (!inventory.ContainsKey("boot")) {
+          inventory.Add("boot", itemData);
+        }
+        else {
+          inventory["boot"] = itemData;
+        }
+
+        boot.color = itemData.level;
+        break;
+    }
+
+    attackMod = 0;
+    defenseMod = 0;
+
+    foreach(KeyValuePair<string, Item> gear in inventory) {
+      attackMod += gear.Value.attackMod;
+      defenseMod += gear.Value.defenseMod;
+    }
+
   }
 }
 

@@ -21,7 +21,6 @@ public class TextHandle {
     writer.Close();
 
     AssetDatabase.ImportAsset(path);
-    TextAsset asset = Resources.Load(file) as TextAsset;
 
     AddSeed(line);
   }

@@ -26,6 +26,8 @@ public class BoardManager : MonoBehaviour
   public GameObject[] floorTiles;
   public GameObject[] wallTiles;
   public GameObject[] outerWallTiles;
+  public GameObject chestTile;
+
   //endless
   private Transform boardHolder;
   private Dictionary<Vector2, Vector2> gridPositions = 
@@ -130,6 +132,12 @@ public class BoardManager : MonoBehaviour
     foreach(KeyValuePair<Vector2, TileType> tile in dungeonTiles) {
       GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
         dungeonBoardHolder);
+
+      //chest
+      if(tile.Value == TileType.chest) {
+        GameManager.instance.InstanceTile(new Vector2(tile.Key.x, tile.Key.y), chestTile,
+          dungeonBoardHolder);
+      }
     }
 
     //borders

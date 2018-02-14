@@ -8,7 +8,7 @@ public enum TileType {
   essential,
   random,
   empty,
-  outerWall
+  chest
 }
 
 public class DungeonManager : MonoBehaviour {
@@ -77,7 +77,7 @@ public class DungeonManager : MonoBehaviour {
         string seedCount = pos + seed.ToString() + "|";
         textHandle.WriteFile("seeds", seedCount);
       }
-        Random.seed = seed;
+        Random.InitState(seed);
     }
 
     gridPositions.Clear();
@@ -129,7 +129,7 @@ public class DungeonManager : MonoBehaviour {
   }
 
   //--------------------------ASTAR------------------------------
-  private void BuildAStarPath() {
+  /*private void BuildAStarPath() {
     ArrayList essentialPath = new ArrayList();
     AStar aStar = new AStar();
 
@@ -157,7 +157,7 @@ public class DungeonManager : MonoBehaviour {
     }
 
     endPos = new Vector2(auxPos.x, auxPos.y);
-  }
+  }*/
 
   //-------------------------RANDOM PATH-------------------------
   private void BuildRandomPath() {
@@ -205,7 +205,13 @@ public class DungeonManager : MonoBehaviour {
         if(!gridPositions.ContainsKey(chamberTilePos) && 
           chamberTilePos.x < maxBound && chamberTilePos.x > 0 &&
           chamberTilePos.y < maxBound && chamberTilePos.y > 0) {
-          gridPositions.Add(chamberTilePos, TileType.empty);
+          
+          if(Random.Range(0, 70) == 1) {
+            gridPositions.Add(chamberTilePos, TileType.chest);
+          }
+          else {
+            gridPositions.Add(chamberTilePos, TileType.empty);
+          }
         }
       }
     }
