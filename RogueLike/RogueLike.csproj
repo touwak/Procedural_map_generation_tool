@@ -105,6 +105,7 @@
     <Compile Include="Assets\Scripts\TextHandle.cs" />
     <Compile Include="Assets\Scripts\Wall.cs" />
     <Compile Include="Assets\Scripts\Weapon.cs" />
+    <Compile Include="Assets\Scripts\WeaponComponents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Fonts\OFL.txt" />

@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Chest : MonoBehaviour {
 
   public Sprite openSprite;
   public Item randomItem;
+  public Weapon weapon;
 
   private SpriteRenderer spriteRenderer;
 
@@ -16,9 +18,18 @@ public class Chest : MonoBehaviour {
   public void Open() {
     spriteRenderer.sprite = openSprite;
 
-    randomItem.RandomItemInit();
+    GameObject toInstantiate;
+
+    if(Random.Range(0, 2) == 1) {
+      randomItem.RandomItemInit();
+      toInstantiate = randomItem.gameObject;
+    }
+    else {
+      toInstantiate = weapon.gameObject;
+    }
+
     GameManager.instance.InstanceTile(new Vector2(transform.position.x, transform.position.y),
-      randomItem.gameObject, transform.parent);
+      toInstantiate, transform.parent);
 
     gameObject.layer = 11;
     spriteRenderer.sortingLayerName = "Items";
