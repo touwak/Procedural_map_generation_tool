@@ -40,8 +40,11 @@ public class BSPDungeonManager : MonoBehaviour {
     bool split = true;
     while (split) {
 
+      //test it
       split = false;
-      foreach(Leaf leaf in leafs) {
+      int count = 0;
+      while(leafs.Count != 0) {
+        Leaf leaf = leafs[count] as Leaf;
         if(leaf.leftChild == null && leaf.rightChild == null) {
           if(leaf.width > maxLeafSize || leaf.height > maxLeafSize 
             || Random.value > 0.25f) {
