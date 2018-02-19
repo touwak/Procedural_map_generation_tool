@@ -29,15 +29,17 @@ public class BSPDungeonManager : MonoBehaviour {
 	}
 
   public void StartDungeon() {
+    width = Random.Range(50, 101);
+    height = Random.Range(50, 101);
 
     GenerateLevel();
   }
 
   //error when the list is modify
   private void GenerateLevel() {
-    Leaf root = new Leaf(0, 0, height, height);
+    Leaf root = new Leaf(0, 0, width, height);
     root.Split();
 
-    root.CreateRooms();
+    root.CreateRooms(gridPositions);
   }
 }

@@ -82,7 +82,7 @@ public class DungeonManager : MonoBehaviour {
     }
 
     gridPositions.Clear();
-    maxBound = Random.Range(50, 101);
+    maxBound = Random.Range(50, maxBound);
 
     //BuildAStarPath();
     BuildEssentialPath();

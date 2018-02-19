@@ -43,8 +43,10 @@ public class GameManager : MonoBehaviour
 
 	void InitGame()	{
 
-		enemies.Clear();
-    boardScript.BoardSetup();
+    //EnterDungeon();
+    EnterBSPDungeon();
+		//enemies.Clear();
+    //boardScript.BoardSetup();
 	}
 	
 	void Update()	{
@@ -99,7 +101,8 @@ public class GameManager : MonoBehaviour
   public void EnterBSPDungeon() {
     dungeonBSPScript.StartDungeon();
     boardScript.SetDungeonBoard(dungeonBSPScript.gridPositions,
-      dungeonBSPScript.height, new Vector2(0, 0));
+      dungeonBSPScript.height, new Vector2(100, 100));
+    playerOne.dungeonTransition = false;
   }
 
   public void ExitDungeon() {

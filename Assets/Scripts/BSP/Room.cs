@@ -29,9 +29,9 @@ public class Room {
     Vector2 pos = new Vector2(xPos, yPos);
 
     for (int y = 0; y <= heigth ; y++) {
-      pos.y += y;
+      pos.y++;
       for(int x = 0; x <= width; x++) {
-        pos.x += x;
+        pos.x++;
 
         roomPos.Add(pos, TileType.essential);
       }

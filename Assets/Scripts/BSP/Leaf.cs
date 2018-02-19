@@ -62,14 +62,14 @@ public class Leaf {
     } 
   }	
 
-  public void CreateRooms() {
+  public void CreateRooms(Dictionary<Vector2, TileType> grid) {
     if(leftChild != null || rightChild != null) {
 
       if(leftChild != null){
-        leftChild.CreateRooms();
+        leftChild.CreateRooms(grid);
       }
       if(rightChild != null) {
-        rightChild.CreateRooms();
+        rightChild.CreateRooms(grid);
       }
     }
     else {
@@ -83,9 +83,13 @@ public class Leaf {
         Random.Range(1, height - roomSize.y - 1));
 
       room = new Room( x + (int)roomPos.x, y + (int)roomPos.y, (int)roomSize.x, (int)roomSize.y);
+     
+      foreach(KeyValuePair<Vector2, TileType> pos in room.roomPositions) {
+        if(!grid.ContainsKey(pos.Key))
+        grid.Add(pos.Key, pos.Value);
+      }
+
     }
   }
-
-
 
 }

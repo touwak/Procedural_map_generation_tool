@@ -127,7 +127,7 @@ public class BoardManager : MonoBehaviour
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int bound, Vector2 endpos) {
 
-    boardHolder.gameObject.SetActive(false);
+    //boardHolder.gameObject.SetActive(false);
     dungeonBoardHolder = new GameObject("Dungeon").transform;
     
     //floor
@@ -143,16 +143,16 @@ public class BoardManager : MonoBehaviour
     }
 
     //borders
-    for (int x = -1; x < bound + 1; x++) {
-      for (int y = -1; y < bound + 1; y++) {
-        if (!dungeonTiles.ContainsKey(new Vector2(x, y)) && 
-            CheckBorders(new Vector2(x, y), dungeonTiles)) {
+    //for (int x = -1; x < bound + 1; x++) {
+    //  for (int y = -1; y < bound + 1; y++) {
+    //    if (!dungeonTiles.ContainsKey(new Vector2(x, y)) && 
+    //        CheckBorders(new Vector2(x, y), dungeonTiles)) {
 
-          GameManager.instance.InstanceTile(new Vector2(x, y),
-            outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
-        }
-      }
-    }
+    //      GameManager.instance.InstanceTile(new Vector2(x, y),
+    //        outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
+    //    }
+    //  }
+    //}
 
     //exit
     GameManager.instance.InstanceTile(endpos, exit, dungeonBoardHolder);
