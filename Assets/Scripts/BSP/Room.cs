@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Room {
 
-  private int xPos;
-  private int yPos;
-  private int width;
-  private int heigth;
+  public int xPos;
+  public int yPos;
+  public int width;
+  public int heigth;
   public Dictionary<Vector2, TileType> roomPositions =
     new Dictionary<Vector2, TileType>();
 

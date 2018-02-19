@@ -71,6 +71,9 @@ public class Leaf {
       if(rightChild != null) {
         rightChild.CreateRooms(grid);
       }
+      if(leftChild != null && rightChild != null) {
+        //CreateCorridor(leftChild.room, rightChild.room, grid);
+      }
     }
     else {
       Vector2 roomSize;
@@ -78,17 +81,150 @@ public class Leaf {
 
       //size between 3x3 and the size of the leaf - 2
       roomSize = new Vector2(Random.Range(3, width - 2), Random.Range(3, height - 2));
-      //pos posible error
       roomPos = new Vector2(Random.Range(1, width - roomSize.x - 1),
         Random.Range(1, height - roomSize.y - 1));
 
       room = new Room( x + (int)roomPos.x, y + (int)roomPos.y, (int)roomSize.x, (int)roomSize.y);
-     
-      foreach(KeyValuePair<Vector2, TileType> pos in room.roomPositions) {
-        if(!grid.ContainsKey(pos.Key))
-        grid.Add(pos.Key, pos.Value);
+
+      DicToDic(room.roomPositions, grid);
+    }
+  }
+
+  public Room GetRoom() {
+    if(room != null) {
+      return room;
+    }
+    else {
+      Room leftRoom = new Room(0, 0, 0, 0);
+      Room rightRoom = new Room(0, 0, 0, 0);
+
+      if(leftChild != null) {
+        leftRoom = leftChild.GetRoom();
+      }
+      if(rightChild != null) {
+        rightRoom = rightChild.GetRoom();
       }
 
+      if(leftChild == null && rightChild == null) {
+        return null;
+      }
+      else if(rightRoom == null) {
+        return leftRoom;
+      }
+      else if(leftRoom == null) {
+        return rightRoom;
+      }
+      else if(Random.value > .5) {
+        return leftRoom;
+      }
+      else {
+        return rightRoom;
+      }
+    }
+  }
+
+  public void CreateCorridor(Room left, Room right, Dictionary<Vector2, TileType> grid) {
+
+    Dictionary<Vector2, TileType> corridors =
+    new Dictionary<Vector2, TileType>();
+
+    Vector2 pointOne = new Vector2(Random.Range(left.xPos + 1, left.width - 2),
+      Random.Range(left.yPos + 1, left.heigth - 2));
+    Vector2 pointTwo = new Vector2(Random.Range(left.xPos + 1, left.width - 2),
+      Random.Range(left.yPos + 1, left.heigth - 2));
+
+    float w = pointTwo.x - pointOne.x;
+    float h = pointTwo.y - pointOne.y;
+
+    if(w < 0) {
+
+      if(h < 0) {
+
+        if(Random.value < 0.5) {
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+        else {
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+      }
+      else if( h > 0) {
+        if(Random.value < 0.5) {
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+        else {
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+      }
+      else {
+        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+      }
+    }
+    else if( w > 0) {
+      if(h < 0) {
+        if(Random.value < 0.5) {
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+        else {
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+      }
+      else if( h > 0) {
+        if(Random.value < 0.5) {
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+        else {
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        }
+      }
+      else {
+        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+      }
+    }
+    else {
+      if(h < 0) {
+        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(w)), corridors);
+      }
+      else {
+        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(w)), corridors);
+      }
+    }
+
+    DicToDic(corridors, grid);
+  }
+
+  public Dictionary<Vector2, TileType> CreateTiles(int posX, int posY, int widthSize, int heigthSize) {
+    Dictionary<Vector2, TileType> tilePos =
+    new Dictionary<Vector2, TileType>();
+
+    int xAux = posX;
+    Vector2 pos = new Vector2(posX, posY);
+
+    for (int y = 0; y <= heigthSize; y++) {
+      pos.y++;
+      for (int x = 0; x <= widthSize; x++) {
+        pos.x++;
+
+        tilePos.Add(pos, TileType.essential);
+      }
+      pos.x = xAux;
+    }
+
+    return tilePos;
+  }
+
+  void DicToDic(Dictionary<Vector2, TileType> origin, Dictionary<Vector2, TileType> destine) {
+    foreach (KeyValuePair<Vector2, TileType> pos in origin) {
+      if (!destine.ContainsKey(pos.Key)) {
+        destine.Add(pos.Key, pos.Value);
+      }
     }
   }
 
