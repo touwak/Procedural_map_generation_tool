@@ -7,16 +7,16 @@ public class Leaf {
 
   private const uint MIN_LEAF_SIZE = 6;
 
-  public int y, x, width, height;
+  public int  x, y, width, height;
   public Leaf leftChild, rightChild;
   public Room room;
   //public Corridor corridor;
 
-  public Leaf(int posX, int posY, int sizeWidth, int sizeHeight) {
-    x = posX;
-    y = posY;
-    width = sizeWidth;
-    height = sizeHeight;
+  public Leaf(int startX, int startY, int widthSize, int heightSize) {
+    x = startX;
+    width = widthSize;
+    y = startY;
+    height = heightSize;
   }
 
   public bool Split() {
@@ -37,7 +37,7 @@ public class Leaf {
       }
 
       int max = (splitH ? height : width) - (int)MIN_LEAF_SIZE;
-      if(max < MIN_LEAF_SIZE) {
+      if (max < MIN_LEAF_SIZE) {
         return false; //is too small
       }
 
@@ -45,6 +45,8 @@ public class Leaf {
       int split = Random.Range((int)MIN_LEAF_SIZE, max);
 
       if (splitH) {
+
+
         leftChild = new Leaf(x, y, width, split);
         rightChild = new Leaf(x, y + split, width, height - split);
       }
@@ -52,6 +54,10 @@ public class Leaf {
         leftChild = new Leaf(x, y, split, height);
         rightChild = new Leaf(x + split, y, width - split, height);
       }
+
+      leftChild.Split();
+      rightChild.Split();
+
       return true;
     } 
   }	

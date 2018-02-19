@@ -10,6 +10,7 @@ public class BSPDungeonManager : MonoBehaviour {
   public int width, height;
   public Dictionary<Vector2, TileType> gridPositions = 
     new Dictionary<Vector2, TileType>();
+  
 
   private void Awake() {
     width = Random.Range(50, 101);
@@ -29,36 +30,13 @@ public class BSPDungeonManager : MonoBehaviour {
 
   public void StartDungeon() {
 
-    CreateLeafs();
+    GenerateLevel();
   }
 
   //error when the list is modify
-  private void CreateLeafs() {
+  private void GenerateLevel() {
     Leaf root = new Leaf(0, 0, height, height);
-    leafs.Add(root);
-
-    bool split = true;
-    while (split) {
-
-      //test it
-      split = false;
-      int count = 0;
-      while(leafs.Count != 0) {
-        Leaf leaf = leafs[count] as Leaf;
-        if(leaf.leftChild == null && leaf.rightChild == null) {
-          if(leaf.width > maxLeafSize || leaf.height > maxLeafSize 
-            || Random.value > 0.25f) {
-
-            if (leaf.Split()) {
-              leafs.Add(leaf.rightChild);
-              leafs.Add(leaf.leftChild);
-
-              split = true;
-            }
-          }
-        }
-      }
-    }
+    root.Split();
 
     root.CreateRooms();
   }
