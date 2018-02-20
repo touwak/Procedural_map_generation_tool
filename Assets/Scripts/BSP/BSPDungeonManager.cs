@@ -34,7 +34,7 @@ public class BSPDungeonManager : MonoBehaviour {
 
   //error when the list is modify
   private void GenerateLevel() {
-    //Leaf root = new Leaf(0, 0, 10, 10);
+    //Leaf root = new Leaf(0, 0, 20, 20);
     Leaf root = new Leaf(0, 0, width, height);
     root.Split();
 

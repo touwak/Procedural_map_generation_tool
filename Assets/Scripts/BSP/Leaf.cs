@@ -128,72 +128,72 @@ public class Leaf {
     Dictionary<Vector2, TileType> corridors =
     new Dictionary<Vector2, TileType>();
 
-    Vector2 pointOne = new Vector2(Random.Range(left.left + 1, left.right - 2),
-      Random.Range(left.top + 1, left.bottom - 2));
-    Vector2 pointTwo = new Vector2(Random.Range(right.left + 1, right.right - 2),
-      Random.Range(right.top + 1, right.bottom - 2));
+    Vector2 point1 = new Vector2(Random.Range(left.left + 1, left.right - 1),
+      Random.Range(left.top + 1, left.bottom - 1));
+    Vector2 point2 = new Vector2(Random.Range(right.left + 1, right.right - 1),
+      Random.Range(right.top + 1, right.bottom - 1));
 
-    float w = pointTwo.x - pointOne.x;
-    float h = pointTwo.y - pointOne.y;
+    float w = point2.x - point1.x;
+    float h = point2.y - point1.y;
 
     if(w < 0) {
 
       if(h < 0) {
 
         if(Random.value < 0.5) {
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
         else {
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point2.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
       else if( h > 0) {
         if(Random.value < 0.5) {
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
-        else {
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        else {//fallo
+          DicToDic(CreateTiles((int)point2.x, (int)point2.y, (int)Mathf.Abs(w) + 1, 1), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
       else { // H == 0
-        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
+        DicToDic(CreateTiles((int)point2.x, (int)point2.y, (int)Mathf.Abs(w), 1), corridors);
       }
     }
     else if( w > 0) {
       if(h < 0) {
         if(Random.value < 0.5) {
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point2.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
-        else {
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        else {//fixed error
+          DicToDic(CreateTiles((int)point1.x, (int)point1.y, (int)Mathf.Abs(w) + 1, 1), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
       else if( h > 0) {
         if(Random.value < 0.5) {
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointTwo.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point2.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
         else {
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
-          DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point2.y, (int)Mathf.Abs(w), 1), corridors);
+          DicToDic(CreateTiles((int)point1.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
       else { // H == 0
-        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
+        DicToDic(CreateTiles((int)point1.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
       }
     }
     else { // W == 0
       if(h < 0) {
-        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
+        DicToDic(CreateTiles((int)point2.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
       }
       else if(h > 0) {
-        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
+        DicToDic(CreateTiles((int)point1.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
       }
     }
 
@@ -224,10 +224,10 @@ public class Leaf {
       if (!destine.ContainsKey(pos.Key)) {
         destine.Add(pos.Key, pos.Value);
       }
-      else {
-        Vector2 n = pos.Key;
-        Debug.LogError(string.Format("Repeted Tile {0} , {1}", n.x, n.y));
-      }
+      //else {
+      //  Vector2 n = pos.Key;
+      //  Debug.LogError(string.Format("Repeted Tile {0} , {1}", n.x, n.y));
+      //}
     }
   }
 
