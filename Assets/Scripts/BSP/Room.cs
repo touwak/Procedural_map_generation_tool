@@ -22,19 +22,18 @@ public class Room {
     roomPositions = CreateRoom();
   }
 
-  //posible error in the positions
   private Dictionary<Vector2, TileType> CreateRoom() {
     Dictionary<Vector2, TileType> roomPos =
     new Dictionary<Vector2, TileType>();
     Vector2 pos = new Vector2(xPos, yPos);
 
     for (int y = 0; y <= heigth ; y++) {
-      pos.y++;
       for(int x = 0; x <= width; x++) {
-        pos.x++;
-
         roomPos.Add(pos, TileType.essential);
+
+        pos.x++;
       }
+      pos.y++;
       pos.x = xPos;
     }
 

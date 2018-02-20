@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 public class Leaf {
 
-  private const uint MIN_LEAF_SIZE = 6;
+  private const uint MIN_LEAF_SIZE = 5;
 
   public int  x, y, width, height;
   public Leaf leftChild, rightChild;
@@ -72,7 +72,7 @@ public class Leaf {
         rightChild.CreateRooms(grid);
       }
       if(leftChild != null && rightChild != null) {
-        //CreateCorridor(leftChild.room, rightChild.room, grid);
+        CreateCorridor(leftChild.GetRoom() , rightChild.GetRoom(), grid);
       }
     }
     else {
@@ -224,6 +224,9 @@ public class Leaf {
     foreach (KeyValuePair<Vector2, TileType> pos in origin) {
       if (!destine.ContainsKey(pos.Key)) {
         destine.Add(pos.Key, pos.Value);
+      }
+      else {
+        Debug.LogError("Repeted Tile");
       }
     }
   }
