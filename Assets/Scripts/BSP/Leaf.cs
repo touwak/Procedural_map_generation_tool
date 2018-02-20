@@ -128,10 +128,10 @@ public class Leaf {
     Dictionary<Vector2, TileType> corridors =
     new Dictionary<Vector2, TileType>();
 
-    Vector2 pointOne = new Vector2(Random.Range(left.xPos + 1, left.width - 2),
-      Random.Range(left.yPos + 1, left.heigth - 2));
-    Vector2 pointTwo = new Vector2(Random.Range(left.xPos + 1, left.width - 2),
-      Random.Range(left.yPos + 1, left.heigth - 2));
+    Vector2 pointOne = new Vector2(Random.Range(left.left + 1, left.right - 2),
+      Random.Range(left.top + 1, left.bottom - 2));
+    Vector2 pointTwo = new Vector2(Random.Range(right.left + 1, right.right - 2),
+      Random.Range(right.top + 1, right.bottom - 2));
 
     float w = pointTwo.x - pointOne.x;
     float h = pointTwo.y - pointOne.y;
@@ -159,7 +159,7 @@ public class Leaf {
           DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
-      else {
+      else { // H == 0
         DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, (int)Mathf.Abs(w), 1), corridors);
       }
     }
@@ -184,16 +184,16 @@ public class Leaf {
           DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
         }
       }
-      else {
+      else { // H == 0
         DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, (int)Mathf.Abs(w), 1), corridors);
       }
     }
-    else {
+    else { // W == 0
       if(h < 0) {
-        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(w)), corridors);
+        DicToDic(CreateTiles((int)pointTwo.x, (int)pointTwo.y, 1, (int)Mathf.Abs(h)), corridors);
       }
-      else {
-        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(w)), corridors);
+      else if(h > 0) {
+        DicToDic(CreateTiles((int)pointOne.x, (int)pointOne.y, 1, (int)Mathf.Abs(h)), corridors);
       }
     }
 
@@ -204,17 +204,16 @@ public class Leaf {
     Dictionary<Vector2, TileType> tilePos =
     new Dictionary<Vector2, TileType>();
 
-    int xAux = posX;
     Vector2 pos = new Vector2(posX, posY);
 
-    for (int y = 0; y <= heigthSize; y++) {
-      pos.y++;
-      for (int x = 0; x <= widthSize; x++) {
-        pos.x++;
+    for (int y = 0; y < heigthSize; y++) {
+      for (int x = 0; x < widthSize; x++) {
 
         tilePos.Add(pos, TileType.essential);
+        pos.x++;
       }
-      pos.x = xAux;
+      pos.y++;
+      pos.x = posX;
     }
 
     return tilePos;
@@ -226,7 +225,8 @@ public class Leaf {
         destine.Add(pos.Key, pos.Value);
       }
       else {
-        Debug.LogError("Repeted Tile");
+        Vector2 n = pos.Key;
+        Debug.LogError(string.Format("Repeted Tile {0} , {1}", n.x, n.y));
       }
     }
   }

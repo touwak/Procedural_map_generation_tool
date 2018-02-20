@@ -8,6 +8,11 @@ public class Room {
   public int yPos;
   public int width;
   public int heigth;
+  public int left;
+  public int right;
+  public int top;
+  public int bottom;
+
   public Dictionary<Vector2, TileType> roomPositions =
     new Dictionary<Vector2, TileType>();
 
@@ -19,18 +24,24 @@ public class Room {
     width = widthSize;
     heigth = heigthSize;
 
+    left = xPos;
+    right = xPos + width - 1;
+    top = yPos + heigth - 1;
+    bottom = yPos;
+
     roomPositions = CreateRoom();
   }
 
   private Dictionary<Vector2, TileType> CreateRoom() {
-    Dictionary<Vector2, TileType> roomPos =
+    Dictionary<Vector2, TileType> roomPos = 
     new Dictionary<Vector2, TileType>();
+
     Vector2 pos = new Vector2(xPos, yPos);
 
-    for (int y = 0; y <= heigth ; y++) {
-      for(int x = 0; x <= width; x++) {
-        roomPos.Add(pos, TileType.essential);
+    for (int y = 0; y < heigth ; y++) {
+      for(int x = 0; x < width; x++) {
 
+        roomPos.Add(pos, TileType.essential);
         pos.x++;
       }
       pos.y++;

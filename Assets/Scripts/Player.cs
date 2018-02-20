@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class Player : MovingObject
 {
 	public int wallDamage = 1;					//How much damage a player does to a wall when chopping it.
-	public Text healthText;						//UI Text to display current player health total.
+	//public Text healthText;						//UI Text to display current player health total.
 	private Animator animator;					//Used to store a reference to the Player's animator component.
 	private int health;             //Used to store player health points total during level.
   private static Vector2 position;
@@ -21,7 +21,7 @@ public class Player : MovingObject
 	{
 		animator = GetComponent<Animator>();
 		health = GameManager.instance.healthPoints;
-    healthText.text = "Health: " + health;
+    //healthText.text = "Health: " + health;
 
     position.x = position.y = 2;
     onWorldBoard = true;
@@ -34,37 +34,37 @@ public class Player : MovingObject
 	
 	private void Update ()
 	{
-		if(!GameManager.instance.playersTurn) return;
+		//if(!GameManager.instance.playersTurn) return;
 		
-		int horizontal = 0;
-		int vertical = 0;
+		//int horizontal = 0;
+		//int vertical = 0;
 
-    bool canMove = false;
+  //  bool canMove = false;
 
-		horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
-		vertical = (int) (Input.GetAxisRaw ("Vertical"));
+		//horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
+		//vertical = (int) (Input.GetAxisRaw ("Vertical"));
 		
-		if(horizontal != 0)	{
-			vertical = 0;
-		}
+		//if(horizontal != 0)	{
+		//	vertical = 0;
+		//}
 
-		if(horizontal != 0 || vertical != 0) {
-      if (!dungeonTransition) {
-        if (onWorldBoard) {
-          canMove = AttemptMove<Wall>(horizontal, vertical);
-        }
-        else {
-          canMove = AttemptMove<Chest>(horizontal, vertical);
-        }
+		//if(horizontal != 0 || vertical != 0) {
+  //    if (!dungeonTransition) {
+  //      if (onWorldBoard) {
+  //        canMove = AttemptMove<Wall>(horizontal, vertical);
+  //      }
+  //      else {
+  //        canMove = AttemptMove<Chest>(horizontal, vertical);
+  //      }
         
-        if (canMove && onWorldBoard) {
-          lastPosition = position;
-          position.x += horizontal;
-          position.y += vertical;
-          GameManager.instance.UpdateBoard(horizontal, vertical);
-        }
-      }
-		}
+  //      if (canMove && onWorldBoard) {
+  //        lastPosition = position;
+  //        position.x += horizontal;
+  //        position.y += vertical;
+  //        GameManager.instance.UpdateBoard(horizontal, vertical);
+  //      }
+  //    }
+		//}
 	}
 	
 	protected override bool AttemptMove <T> (int xDir, int yDir) {	
@@ -90,7 +90,7 @@ public class Player : MovingObject
 	public void LoseHealth (int loss) {
 		animator.SetTrigger ("playerHit");
 		health -= loss;
-		healthText.text = "-"+ loss + " Health: " + health;
+		//healthText.text = "-"+ loss + " Health: " + health;
 		
 		CheckIfGameOver ();
 	}
