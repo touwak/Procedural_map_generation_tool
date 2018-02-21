@@ -10,7 +10,6 @@ public class Leaf {
   public int  x, y, width, height;
   public Leaf leftChild, rightChild;
   public Room room;
-  //public Corridor corridor;
 
   public Leaf(int startX, int startY, int widthSize, int heightSize) {
     x = startX;
@@ -45,8 +44,6 @@ public class Leaf {
       int split = Random.Range((int)MIN_LEAF_SIZE, max);
 
       if (splitH) {
-
-
         leftChild = new Leaf(x, y, width, split);
         rightChild = new Leaf(x, y + split, width, height - split);
       }
@@ -154,7 +151,7 @@ public class Leaf {
           DicToDic(CreateTiles((int)point2.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
           DicToDic(CreateTiles((int)point2.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
-        else {//fallo
+        else {//fixed error
           DicToDic(CreateTiles((int)point2.x, (int)point2.y, (int)Mathf.Abs(w) + 1, 1), corridors);
           DicToDic(CreateTiles((int)point1.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }

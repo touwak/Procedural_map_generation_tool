@@ -142,17 +142,17 @@ public class BoardManager : MonoBehaviour
       }
     }
 
-    //borders
-    //for (int x = -1; x < bound + 1; x++) {
-    //  for (int y = -1; y < bound + 1; y++) {
-    //    if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
-    //        CheckBorders(new Vector2(x, y), dungeonTiles)) {
+    //borders //TODO some errors with the BSP
+    for (int x = -1; x < bound + 1; x++) {
+      for (int y = -1; y < bound + 1; y++) {
+        if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
+            CheckBorders(new Vector2(x, y), dungeonTiles)) {
 
-    //      GameManager.instance.InstanceTile(new Vector2(x, y),
-    //        outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
-    //    }
-    //  }
-    //}
+          GameManager.instance.InstanceTile(new Vector2(x, y),
+            outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
+        }
+      }
+    }
 
     //exit
     GameManager.instance.InstanceTile(endpos, exit, dungeonBoardHolder);

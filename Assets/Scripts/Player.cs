@@ -135,7 +135,7 @@ public class Player : MovingObject
     Item itemData = item.GetComponent<Item>();
 
     switch (itemData.type) {
-      case ItemType.gloove:
+      case ItemType.glove:
         if (!inventory.ContainsKey("glove")) {
           inventory.Add("glove", itemData);
         }

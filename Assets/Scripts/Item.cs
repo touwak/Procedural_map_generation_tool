@@ -5,7 +5,7 @@ using System;
 using Random = UnityEngine.Random;
 
 public enum ItemType {
-  gloove,
+  glove,
   boot
 }
 
@@ -30,7 +30,7 @@ public class Item : MonoBehaviour {
     type = (ItemType)Random.Range(0, itemCount);
 
     switch (type) {
-      case ItemType.gloove:
+      case ItemType.glove:
         attackMod = Random.Range(1, 4);
         defenseMod = 0;
         spriteRenderer.sprite = glove;
