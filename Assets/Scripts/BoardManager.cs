@@ -125,7 +125,7 @@ public class BoardManager : MonoBehaviour
   
 
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
-    int bound, Vector2 endpos) {
+    int width, int height, Vector2 endpos) {
 
     //boardHolder.gameObject.SetActive(false);
     dungeonBoardHolder = new GameObject("Dungeon").transform;
@@ -143,8 +143,8 @@ public class BoardManager : MonoBehaviour
     }
 
     //borders //TODO some errors with the BSP
-    for (int x = -1; x < bound + 1; x++) {
-      for (int y = -1; y < bound + 1; y++) {
+    for (int x = -1; x < width + 1; x++) {
+      for (int y = -1; y < height + 1; y++) {
         if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
             CheckBorders(new Vector2(x, y), dungeonTiles)) {
 

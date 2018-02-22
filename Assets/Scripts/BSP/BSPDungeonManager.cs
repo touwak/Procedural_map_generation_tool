@@ -30,6 +30,8 @@ public class BSPDungeonManager : MonoBehaviour {
     height = Random.Range(50, 101);
 
     GenerateLevel();
+
+    Debug.LogFormat("width: {0}, height: {1}", width, height);
   }
 
   //error when the list is modify

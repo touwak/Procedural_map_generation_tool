@@ -43,8 +43,8 @@ public class GameManager : MonoBehaviour
 
 	void InitGame()	{
 
-    //EnterDungeon();
-    EnterBSPDungeon();
+    EnterDungeon();
+    //EnterBSPDungeon();
 		//enemies.Clear();
     //boardScript.BoardSetup();
 	}
@@ -94,14 +94,14 @@ public class GameManager : MonoBehaviour
   public void EnterDungeon() {
     dungeonScript.StartDungeon(playerOne.GetPosition());
     boardScript.SetDungeonBoard(dungeonScript.gridPositions,
-      dungeonScript.maxBound, dungeonScript.endPos);
+      dungeonScript.maxBound, dungeonScript.maxBound, dungeonScript.endPos);
     playerOne.dungeonTransition = false;
   }
 
   public void EnterBSPDungeon() {
     dungeonBSPScript.StartDungeon();
     boardScript.SetDungeonBoard(dungeonBSPScript.gridPositions,
-      dungeonBSPScript.height, new Vector2(100, 100));
+      dungeonBSPScript.width, dungeonBSPScript.height, new Vector2(100, 100));
     playerOne.dungeonTransition = false;
   }
 
