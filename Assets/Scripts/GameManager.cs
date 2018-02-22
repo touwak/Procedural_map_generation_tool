@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
   private Player playerOne;
   private TextHandle textHandle;
   private BSPDungeonManager dungeonBSPScript;
+  private MapGenerator automataScript;
 
   void Awake() {
     if (instance == null) {
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     boardScript = GetComponent<BoardManager>();
     dungeonScript = GetComponent<DungeonManager>();
     dungeonBSPScript = GetComponent<BSPDungeonManager>();
+    automataScript = GetComponent<MapGenerator>();
     playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     textHandle = new TextHandle();
     textHandle.ReadFile("seeds");
@@ -43,7 +45,8 @@ public class GameManager : MonoBehaviour
 
 	void InitGame()	{
 
-    EnterDungeon();
+    EnterAutomataCave();
+    //EnterDungeon();
     //EnterBSPDungeon();
 		//enemies.Clear();
     //boardScript.BoardSetup();
@@ -103,6 +106,10 @@ public class GameManager : MonoBehaviour
     boardScript.SetDungeonBoard(dungeonBSPScript.gridPositions,
       dungeonBSPScript.width, dungeonBSPScript.height, new Vector2(100, 100));
     playerOne.dungeonTransition = false;
+  }
+
+  public void EnterAutomataCave() {
+    automataScript.GenerateMap();
   }
 
   public void ExitDungeon() {
