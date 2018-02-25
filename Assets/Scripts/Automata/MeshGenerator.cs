@@ -59,6 +59,7 @@ public class MeshGenerator : MonoBehaviour {
         wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight); // bottom left
         wallVertices.Add(vertices[outline[i + 1]] - Vector3.up * wallHeight); // bottom right
 
+        //two triangles of every quad of the wall
         wallTriangles.Add(startIndex + 0);
         wallTriangles.Add(startIndex + 2);
         wallTriangles.Add(startIndex + 3);
@@ -71,6 +72,218 @@ public class MeshGenerator : MonoBehaviour {
     wallMesh.vertices = wallVertices.ToArray();
     wallMesh.triangles = wallTriangles.ToArray();
     walls.mesh = wallMesh;
+  }
+
+
+  //params = unknow array number, you can send many params to the function, see above
+  void MeshFromPoints(params Node[] points) {
+    AssignVertices(points);
+
+    //create all the triangles of the mesh
+    if (points.Length >= 3)
+      CreateTriangle(points[0], points[1], points[2]);
+    if (points.Length >= 4)
+      CreateTriangle(points[0], points[2], points[3]);
+    if (points.Length >= 5)
+      CreateTriangle(points[0], points[3], points[4]);
+    if (points.Length >= 6)
+      CreateTriangle(points[0], points[4], points[5]);
+
+  }
+
+  void AssignVertices(Node[] points) {
+    for (int i = 0; i < points.Length; i++) {
+      if (points[i].vertexIndex == -1) {
+        points[i].vertexIndex = vertices.Count; //index 0,1,2...
+        vertices.Add(points[i].position);
+      }
+    }
+  }
+
+  //------------------------------------OUTLINE-------------------------------------
+
+  void CalculateMeshOutlines() {
+    for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) {
+      if (!checkedVertices.Contains(vertexIndex)) {
+        int newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
+        if (newOutlineVertex != -1) {
+          checkedVertices.Add(vertexIndex);
+
+          List<int> newOutline = new List<int> { vertexIndex};
+          outlines.Add(newOutline);
+          FollowOutline(newOutlineVertex, outlines.Count - 1);
+          outlines[outlines.Count - 1].Add(vertexIndex);
+        }
+      }
+    }
+  }
+  //follow the vertices line recursively and adding them to outlines dic
+  void FollowOutline(int vertexIndex, int outlineIndex) {
+    outlines[outlineIndex].Add(vertexIndex);
+    checkedVertices.Add(vertexIndex);
+    int nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
+
+    if (nextVertexIndex != -1) {
+      FollowOutline(nextVertexIndex, outlineIndex);
+    }
+  }
+  //follow the edge line
+  int GetConnectedOutlineVertex(int vertexIndex) {
+    List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
+
+    for (int i = 0; i < trianglesContainingVertex.Count; i++) {
+      Triangle triangle = trianglesContainingVertex[i];
+
+      for (int j = 0; j < 3; j++) {
+        int vertexB = triangle[j];
+        if (vertexB != vertexIndex && !checkedVertices.Contains(vertexB)) {
+          if (IsOutlineEdge(vertexIndex, vertexB)) {
+            return vertexB;
+          }
+        }
+      }
+    }
+
+    return -1;
+  }
+
+  //if vertexA and vertexB share only one triangle it is a outline edge
+  bool IsOutlineEdge(int vertexA, int vertexB) {
+    List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
+    int sharedTriangleCount = 0;
+
+    for (int i = 0; i < trianglesContainingVertexA.Count; i++) {
+      if (trianglesContainingVertexA[i].Contains(vertexB)) {
+        sharedTriangleCount++;
+        if (sharedTriangleCount > 1) {
+          break;
+        }
+      }
+    }
+    return sharedTriangleCount == 1;
+  }
+
+  //--------------------------------------TRIANGLE-----------------------------------
+
+  struct Triangle {
+    public int vertexIndexA;
+    public int vertexIndexB;
+    public int vertexIndexC;
+    int[] vertices;
+
+    public Triangle(int a, int b, int c) {
+      vertexIndexA = a;
+      vertexIndexB = b;
+      vertexIndexC = c;
+
+      vertices = new int[3];
+      vertices[0] = a;
+      vertices[1] = b;
+      vertices[2] = c;
+    }
+
+    public int this[int i] {//To access like array
+      get {
+        return vertices[i];
+      }
+    }
+
+
+    public bool Contains(int vertexIndex) {
+      return vertexIndex == vertexIndexA || 
+        vertexIndex == vertexIndexB || 
+        vertexIndex == vertexIndexC;
+    }
+  }
+
+  void CreateTriangle(Node a, Node b, Node c) {
+    triangles.Add(a.vertexIndex);
+    triangles.Add(b.vertexIndex);
+    triangles.Add(c.vertexIndex);
+
+    Triangle triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
+    AddTriangleToDictionary(triangle.vertexIndexA, triangle);
+    AddTriangleToDictionary(triangle.vertexIndexB, triangle);
+    AddTriangleToDictionary(triangle.vertexIndexC, triangle);
+  }
+
+  void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle) {
+    if (triangleDictionary.ContainsKey(vertexIndexKey)) {
+      triangleDictionary[vertexIndexKey].Add(triangle);
+    }
+    else {
+      List<Triangle> triangleList = new List<Triangle> { triangle };
+      triangleDictionary.Add(vertexIndexKey, triangleList);
+    }
+  }
+
+
+  //-------------------------------------SQUARE--------------------------------------
+
+  //each square forms a "quad" 
+  public class Square {
+
+    public ControlNode topLeft, topRight, bottomRight, bottomLeft;
+    public Node centreTop, centreRight, centreBottom, centreLeft;
+    public int configuration;
+
+    public Square(ControlNode _topLeft, ControlNode _topRight, 
+      ControlNode _bottomRight, ControlNode _bottomLeft) {
+
+      topLeft = _topLeft;
+      topRight = _topRight;
+      bottomRight = _bottomRight;
+      bottomLeft = _bottomLeft;
+
+      centreTop = topLeft.right;
+      centreRight = bottomRight.above;
+      centreBottom = bottomLeft.right;
+      centreLeft = bottomLeft.above;
+
+      //in binary 0000
+      if (topLeft.active)
+        configuration += 8;       //1000
+      if (topRight.active)
+        configuration += 4;       //0100
+      if (bottomRight.active)
+        configuration += 2;       //0010
+      if (bottomLeft.active)
+        configuration += 1;       //0001
+    }
+
+  }
+
+  public class SquareGrid {
+    public Square[,] squares;
+
+    public SquareGrid(int[,] map, float squareSize) {
+      int nodeCountX = map.GetLength(0);
+      int nodeCountY = map.GetLength(1);
+      float mapWidth = nodeCountX * squareSize;
+      float mapHeight = nodeCountY * squareSize;
+
+      ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
+
+      for (int x = 0; x < nodeCountX; x++) {
+        for (int y = 0; y < nodeCountY; y++) {
+          //-mapWidth / 2 = far left | squareSize / 2 = to center around the square 
+          Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2,
+            0, -mapHeight / 2 + y * squareSize + squareSize / 2);
+          
+          //1 is active
+          controlNodes[x, y] = new ControlNode(pos, map[x, y] == 1, squareSize);
+        }
+      }
+
+      squares = new Square[nodeCountX - 1, nodeCountY - 1];
+      for (int x = 0; x < nodeCountX - 1; x++) {
+        for (int y = 0; y < nodeCountY - 1; y++) {
+          squares[x, y] = new Square(controlNodes[x, y + 1],
+            controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+        }
+      }
+
+    }
   }
 
   void TriangulateSquare(Square square) {
@@ -138,212 +351,6 @@ public class MeshGenerator : MonoBehaviour {
 
   }
 
-  //params = unknow array number, you can send many params to the function, see above
-  void MeshFromPoints(params Node[] points) {
-    AssignVertices(points);
-
-    //create all the triangles of the mesh
-    if (points.Length >= 3)
-      CreateTriangle(points[0], points[1], points[2]);
-    if (points.Length >= 4)
-      CreateTriangle(points[0], points[2], points[3]);
-    if (points.Length >= 5)
-      CreateTriangle(points[0], points[3], points[4]);
-    if (points.Length >= 6)
-      CreateTriangle(points[0], points[4], points[5]);
-
-  }
-
-  void AssignVertices(Node[] points) {
-    for (int i = 0; i < points.Length; i++) {
-      if (points[i].vertexIndex == -1) {
-        points[i].vertexIndex = vertices.Count; //0,1,2...
-        vertices.Add(points[i].position);
-      }
-    }
-  }
-
-  void CreateTriangle(Node a, Node b, Node c) {
-    triangles.Add(a.vertexIndex);
-    triangles.Add(b.vertexIndex);
-    triangles.Add(c.vertexIndex);
-
-    Triangle triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
-    AddTriangleToDictionary(triangle.vertexIndexA, triangle);
-    AddTriangleToDictionary(triangle.vertexIndexB, triangle);
-    AddTriangleToDictionary(triangle.vertexIndexC, triangle);
-  }
-
-  void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle) {
-    if (triangleDictionary.ContainsKey(vertexIndexKey)) {
-      triangleDictionary[vertexIndexKey].Add(triangle);
-    }
-    else {
-      List<Triangle> triangleList = new List<Triangle> { triangle };
-      triangleDictionary.Add(vertexIndexKey, triangleList);
-    }
-  }
-
-  void CalculateMeshOutlines() {
-
-    for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) {
-      if (!checkedVertices.Contains(vertexIndex)) {
-        int newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
-        if (newOutlineVertex != -1) {
-          checkedVertices.Add(vertexIndex);
-
-          List<int> newOutline = new List<int> { vertexIndex};
-          outlines.Add(newOutline);
-          FollowOutline(newOutlineVertex, outlines.Count - 1);
-          outlines[outlines.Count - 1].Add(vertexIndex);
-        }
-      }
-    }
-  }
-
-  void FollowOutline(int vertexIndex, int outlineIndex) {
-    outlines[outlineIndex].Add(vertexIndex);
-    checkedVertices.Add(vertexIndex);
-    int nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
-
-    if (nextVertexIndex != -1) {
-      FollowOutline(nextVertexIndex, outlineIndex);
-    }
-  }
-
-  int GetConnectedOutlineVertex(int vertexIndex) {
-    List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
-
-    for (int i = 0; i < trianglesContainingVertex.Count; i++) {
-      Triangle triangle = trianglesContainingVertex[i];
-
-      for (int j = 0; j < 3; j++) {
-        int vertexB = triangle[j];
-        if (vertexB != vertexIndex && !checkedVertices.Contains(vertexB)) {
-          if (IsOutlineEdge(vertexIndex, vertexB)) {
-            return vertexB;
-          }
-        }
-      }
-    }
-
-    return -1;
-  }
-
-  bool IsOutlineEdge(int vertexA, int vertexB) {
-    List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
-    int sharedTriangleCount = 0;
-
-    for (int i = 0; i < trianglesContainingVertexA.Count; i++) {
-      if (trianglesContainingVertexA[i].Contains(vertexB)) {
-        sharedTriangleCount++;
-        if (sharedTriangleCount > 1) {
-          break;
-        }
-      }
-    }
-    return sharedTriangleCount == 1;
-  }
-
-  //--------------------------------------TRIANGLE-----------------------------------
-
-  struct Triangle {
-    public int vertexIndexA;
-    public int vertexIndexB;
-    public int vertexIndexC;
-    int[] vertices;
-
-    public Triangle(int a, int b, int c) {
-      vertexIndexA = a;
-      vertexIndexB = b;
-      vertexIndexC = c;
-
-      vertices = new int[3];
-      vertices[0] = a;
-      vertices[1] = b;
-      vertices[2] = c;
-    }
-
-    public int this[int i] {//To access like array
-      get {
-        return vertices[i];
-      }
-    }
-
-
-    public bool Contains(int vertexIndex) {
-      return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB || vertexIndex == vertexIndexC;
-    }
-  }
-
-
- //-------------------------------------SQUARE--------------------------------------
-
-  //each square forms a "quad" 
-  public class Square {
-
-    public ControlNode topLeft, topRight, bottomRight, bottomLeft;
-    public Node centreTop, centreRight, centreBottom, centreLeft;
-    public int configuration;
-
-    public Square(ControlNode _topLeft, ControlNode _topRight, 
-      ControlNode _bottomRight, ControlNode _bottomLeft) {
-
-      topLeft = _topLeft;
-      topRight = _topRight;
-      bottomRight = _bottomRight;
-      bottomLeft = _bottomLeft;
-
-      centreTop = topLeft.right;
-      centreRight = bottomRight.above;
-      centreBottom = bottomLeft.right;
-      centreLeft = bottomLeft.above;
-
-      //in binary 0000
-      if (topLeft.active)
-        configuration += 8;       //1000
-      if (topRight.active)
-        configuration += 4;       //0100
-      if (bottomRight.active)
-        configuration += 2;       //0010
-      if (bottomLeft.active)
-        configuration += 1;       //0001
-    }
-
-  }
-
-  public class SquareGrid {
-    public Square[,] squares;
-
-    public SquareGrid(int[,] map, float squareSize) {
-      int nodeCountX = map.GetLength(0);
-      int nodeCountY = map.GetLength(1);
-      float mapWidth = nodeCountX * squareSize;
-      float mapHeight = nodeCountY * squareSize;
-
-      ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
-
-      for (int x = 0; x < nodeCountX; x++) {
-        for (int y = 0; y < nodeCountY; y++) {
-          //-mapWidth / 2 = far left | squareSize / 2 = to center around the square 
-          Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2,
-            0, -mapHeight / 2 + y * squareSize + squareSize / 2);
-          
-          //1 is active
-          controlNodes[x, y] = new ControlNode(pos, map[x, y] == 1, squareSize);
-        }
-      }
-
-      squares = new Square[nodeCountX - 1, nodeCountY - 1];
-      for (int x = 0; x < nodeCountX - 1; x++) {
-        for (int y = 0; y < nodeCountY - 1; y++) {
-          squares[x, y] = new Square(controlNodes[x, y + 1],
-            controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
-        }
-      }
-
-    }
-  }
 
   //--------------------------------------NODES-------------------------------------------
 
