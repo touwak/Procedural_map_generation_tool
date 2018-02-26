@@ -45,12 +45,12 @@ public class GameManager : MonoBehaviour
 
 	void InitGame()	{
 
-    EnterAutomataCave();
-    //EnterDungeon();
-    //EnterBSPDungeon();
-		//enemies.Clear();
     //boardScript.BoardSetup();
-	}
+    //EnterDungeon();
+    EnterBSPDungeon();
+    //EnterAutomataCave();
+    //enemies.Clear();
+  }
 	
 	void Update()	{
 

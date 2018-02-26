@@ -34,38 +34,38 @@ public class Player : MovingObject
 	
 	private void Update ()
 	{
-		//if(!GameManager.instance.playersTurn) return;
-		
-		//int horizontal = 0;
-		//int vertical = 0;
+    if (!GameManager.instance.playersTurn) return;
 
-  //  bool canMove = false;
+    int horizontal = 0;
+    int vertical = 0;
 
-		//horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
-		//vertical = (int) (Input.GetAxisRaw ("Vertical"));
-		
-		//if(horizontal != 0)	{
-		//	vertical = 0;
-		//}
+    bool canMove = false;
 
-		//if(horizontal != 0 || vertical != 0) {
-  //    if (!dungeonTransition) {
-  //      if (onWorldBoard) {
-  //        canMove = AttemptMove<Wall>(horizontal, vertical);
-  //      }
-  //      else {
-  //        canMove = AttemptMove<Chest>(horizontal, vertical);
-  //      }
-        
-  //      if (canMove && onWorldBoard) {
-  //        lastPosition = position;
-  //        position.x += horizontal;
-  //        position.y += vertical;
-  //        GameManager.instance.UpdateBoard(horizontal, vertical);
-  //      }
-  //    }
-		//}
-	}
+    horizontal = (int)(Input.GetAxisRaw("Horizontal"));
+    vertical = (int)(Input.GetAxisRaw("Vertical"));
+
+    if (horizontal != 0) {
+      vertical = 0;
+    }
+
+    if (horizontal != 0 || vertical != 0) {
+      if (!dungeonTransition) {
+        if (onWorldBoard) {
+          canMove = AttemptMove<Wall>(horizontal, vertical);
+        }
+        else {
+          canMove = AttemptMove<Chest>(horizontal, vertical);
+        }
+
+        if (canMove && onWorldBoard) {
+          lastPosition = position;
+          position.x += horizontal;
+          position.y += vertical;
+          GameManager.instance.UpdateBoard(horizontal, vertical);
+        }
+      }
+    }
+  }
 	
 	protected override bool AttemptMove <T> (int xDir, int yDir) {	
 		bool hit = base.AttemptMove <T> (xDir, yDir);
@@ -108,8 +108,8 @@ public class Player : MovingObject
   private void GoDungeonPortal() {
     if (onWorldBoard) {
       onWorldBoard = false;
-      //GameManager.instance.EnterDungeon();
-      GameManager.instance.EnterBSPDungeon();
+      GameManager.instance.EnterDungeon();
+      //GameManager.instance.EnterBSPDungeon();
       transform.position = DungeonManager.startPos;
     }
     else {

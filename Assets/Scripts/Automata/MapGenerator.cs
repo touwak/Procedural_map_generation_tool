@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -207,15 +207,25 @@ public class MapGenerator : MonoBehaviour {
       }
     }
 
+    // order the rooms and mark bigger like main
+    survivingRooms.Sort();
+    foreach(Room r in survivingRooms) {
+      print(r.roomSize);
+    }
+    survivingRooms[0].mainRoom = true;
+    survivingRooms[0].isAccesibleFromMainRoom = true;
+
     ConnectClosestRooms(survivingRooms);
   }
 
   //----------------------------------------ROOM-------------------------------------
-  class Room {
+  class Room : IComparable<Room> {
     public List<Coord> tiles;
     public List<Coord> edgeTiles;
     public List<Room> connectedRooms;
     public int roomSize;
+    public bool isAccesibleFromMainRoom;
+    public bool mainRoom;
 
     public Room() {
 
@@ -226,6 +236,7 @@ public class MapGenerator : MonoBehaviour {
       roomSize = tiles.Count;
       connectedRooms = new List<Room>();
 
+      // detect edge tiles
       edgeTiles = new List<Coord>();
       foreach(Coord tile in tiles) {
         for(int x = tile.tileX - 1; x < tile.tileX + 1; x++) {
@@ -240,18 +251,63 @@ public class MapGenerator : MonoBehaviour {
       }
     }
 
+    // set accesible from main room true and every connected room to this
+    public void SetAccesibleFromMainRoom() {
+      if (!isAccesibleFromMainRoom) {
+        isAccesibleFromMainRoom = true;
+
+        foreach(Room connectedRoom in connectedRooms) {
+          connectedRoom.SetAccesibleFromMainRoom();
+        }
+      }
+    }
+
+    // connect rooms and set access to the main room
     public static void ConnectRooms(Room roomA, Room roomB) {
+
+      if (roomA.isAccesibleFromMainRoom) {
+        roomB.SetAccesibleFromMainRoom();
+      }
+      else if (roomB.isAccesibleFromMainRoom) {
+        roomA.SetAccesibleFromMainRoom();
+      }
+
       roomA.connectedRooms.Add(roomB);
       roomB.connectedRooms.Add(roomA);
     }
 
+    // return if is conected with other room
     public bool IsConnected(Room otherRoom) {
       return connectedRooms.Contains(otherRoom);
+    }
+
+    // to sort lists
+    public int CompareTo(Room otherRoom) {
+      return otherRoom.roomSize.CompareTo(roomSize);
     }
   }
 
 
-  void ConnectClosestRooms(List<Room> allRooms) {
+  void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
+
+    List<Room> roomListA = new List<Room>(); 
+    List<Room> roomListB = new List<Room>(); 
+
+    if (forceAccessibilityFromMainRoom) {
+      foreach(Room room in allRooms) {
+        if (room.isAccesibleFromMainRoom) {
+          roomListB.Add(room);  // accesible from main room
+        }
+        else{
+          roomListA.Add(room);  // not accesible from main room
+        }
+      }
+    }
+    else {
+      roomListA = allRooms;
+      roomListB = allRooms;
+    }
+
     int bestDistance = 0;
     Coord bestTileA = new Coord();
     Coord bestTileB = new Coord();
@@ -259,18 +315,21 @@ public class MapGenerator : MonoBehaviour {
     Room bestRoomB = new Room();
     bool possibleConectionFound = false;
 
-    foreach(Room roomA in allRooms) {
-      possibleConectionFound = false;
+    foreach(Room roomA in roomListA) {
+      if (!forceAccessibilityFromMainRoom) {
+        possibleConectionFound = false;
 
-      foreach (Room roomB in allRooms) {
-        if(roomA == roomB) {
+        if (roomA.connectedRooms.Count > 0) {
           continue;
         }
-        if (roomA.IsConnected(roomB)) {
-          possibleConectionFound = false;
-          break;
-        }
+      }
 
+      foreach (Room roomB in roomListB) {
+        if(roomA == roomB || roomA.IsConnected(roomB)) {
+          continue;
+        }
+        
+        // compare the edge tiles of both rooms and connect to the nearest
         for(int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++) {
           for (int tileIndexB = 0; tileIndexB < roomB.edgeTiles.Count; tileIndexB++) {
             Coord tileA = roomA.edgeTiles[tileIndexA];
@@ -289,23 +348,102 @@ public class MapGenerator : MonoBehaviour {
           }
         }
       }
-
-      if (possibleConectionFound) {
+      // if have found a conection with oter room conect both
+      if (possibleConectionFound && !forceAccessibilityFromMainRoom) {
         CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
       }
     }
+    // check again for better conections 
+    if (possibleConectionFound && forceAccessibilityFromMainRoom) {
+      CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+      ConnectClosestRooms(allRooms, true);
+    }
 
-
+    if (!forceAccessibilityFromMainRoom) {
+      ConnectClosestRooms(allRooms, true);
+    }
 
   }
 
   void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB) {
     Room.ConnectRooms(roomA, roomB);
-    Debug.DrawLine(CoordToWorldPoint(tileA), CoordToWorldPoint(tileB), Color.green, 100);
+
+    List<Coord> line = GetLine(tileA, tileB);
+    foreach(Coord c in line) {
+      DrawCircle(c, 1);
+    }
+  }
+
+  // Create the path to conect the rooms / radius is the size of the path
+  void DrawCircle(Coord c, int r) { //TODO editable
+    for (int x = -r; x <= r; x++) {
+      for (int y = -r; y <= r; y++) {
+        if(x * x + y * y <= r * r) { // check if is inside the circle
+          int drawX = c.tileX + x;
+          int drawY = c.tileY + y;
+
+          if (IsInMapeRange(drawX, drawY)) {
+            map[drawX, drawY] = 0;
+          }
+        }
+      }
+    }
+  }
+
+  // Create the line that joins the caves
+  List<Coord> GetLine(Coord from, Coord to) {
+
+    List<Coord> line = new List<Coord>();
+
+    int x = from.tileX;
+    int y = from.tileY;
+
+    int dx = to.tileX - from.tileX;
+    int dy = to.tileY - from.tileY;
+
+    bool inverted = false;
+    int step = Math.Sign(dx);
+    int gradientStep = Math.Sign(dy);
+
+    int longest = Math.Abs(dx);
+    int shortest = Math.Abs(dy);
+
+    if(longest < shortest) {
+      inverted = true;
+      longest = Math.Abs(dy);
+      shortest = Math.Abs(dx);
+
+      step = Math.Sign(dy);
+      gradientStep = Math.Sign(dx);
+    }
+
+    int gradientAccumulation = longest / 2;
+    for(int i = 0; i < longest; i++) {
+      line.Add(new Coord(x, y));
+
+      if (inverted) {
+        y += step;
+      }
+      else {
+        x += step;
+      }
+
+      gradientAccumulation += shortest;
+      if(gradientAccumulation >= longest) {
+        if (inverted) {
+          x += gradientStep;
+        }
+        else {
+          y += gradientStep;
+        }
+        gradientAccumulation -= longest;
+      }
+    }
+
+    return line;
   }
 
   Vector3 CoordToWorldPoint(Coord tile) {
-
     return new Vector3(-width / 2 + .5f + tile.tileX, 2, -height / 2 + .5f + tile.tileY);
   }
 
