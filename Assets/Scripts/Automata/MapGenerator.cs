@@ -209,9 +209,6 @@ public class MapGenerator : MonoBehaviour {
 
     // order the rooms and mark bigger like main
     survivingRooms.Sort();
-    foreach(Room r in survivingRooms) {
-      print(r.roomSize);
-    }
     survivingRooms[0].mainRoom = true;
     survivingRooms[0].isAccesibleFromMainRoom = true;
 
