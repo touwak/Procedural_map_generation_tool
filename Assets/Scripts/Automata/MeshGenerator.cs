@@ -8,6 +8,7 @@ public class MeshGenerator : MonoBehaviour {
   public MeshFilter walls;
   public MeshFilter cave;
   public bool is2D;
+  MeshCollider wallCollider;
 
   List<Vector3> vertices;
   List<int> triangles;
@@ -20,7 +21,7 @@ public class MeshGenerator : MonoBehaviour {
 
     triangleDictionary.Clear();
     outlines.Clear();
-    checkedVertices.Clear();
+    checkedVertices.Clear();    
 
     squareGrid = new SquareGrid(map, squareSize);
 
@@ -97,7 +98,11 @@ public class MeshGenerator : MonoBehaviour {
     walls.mesh = wallMesh;
 
     // 3D colliders for the wall
-    MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider>();
+    if(wallCollider != null) {
+      Destroy(wallCollider);
+    }
+
+    wallCollider = walls.gameObject.AddComponent<MeshCollider>();
     wallCollider.sharedMesh = wallMesh;
   }
 
@@ -122,7 +127,7 @@ public class MeshGenerator : MonoBehaviour {
     for (int i = 0; i < points.Length; i++) {
       if (points[i].vertexIndex == -1) {
         points[i].vertexIndex = vertices.Count; //index 0,1,2...
-        vertices.Add(points[i].position);
+        vertices.Add(points[i].position); // the vertexIndex will be used in this list
       }
     }
   }
@@ -144,7 +149,7 @@ public class MeshGenerator : MonoBehaviour {
       }
     }
   }
-  //follow the vertices line recursively and adding them to outlines dic
+  //follow the vertices line recursively and adding them to outlines list
   void FollowOutline(int vertexIndex, int outlineIndex) {
     outlines[outlineIndex].Add(vertexIndex);
     checkedVertices.Add(vertexIndex);
@@ -247,7 +252,15 @@ public class MeshGenerator : MonoBehaviour {
 
   //-------------------------------------SQUARE--------------------------------------
 
-  //each square forms a "quad" 
+  /*
+O--o--O  The corners are control nodes and the inside are nodes
+|     |  The control node control the above and rigth nodes 
+o     o
+|     |
+O--o--O
+
+*/
+
   public class Square {
 
     public ControlNode topLeft, topRight, bottomRight, bottomLeft;
@@ -380,15 +393,6 @@ public class MeshGenerator : MonoBehaviour {
 
 
   //--------------------------------------NODES-------------------------------------------
-
-  /*
- O--o--O  The corners are control nodes and the inside are nodes
- |     |  The control node control the nodes at the sides
- o     o
- |     |
- O--o--O
-
-   */
 
   public class Node {
     public Vector3 position;

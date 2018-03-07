@@ -71,7 +71,7 @@ public class MapGenerator : MonoBehaviour {
           map[x, y] = 1;
         }
         else {
-          rnd = Random.Range(0, 100);
+          rnd = Random.Range(0, 100 + 1);
           map[x, y] = (rnd < randomFillPercent) ? 1 : 0;
         }
       }
