@@ -28,6 +28,10 @@ public class BoardManager : MonoBehaviour
   public GameObject[] outerWallTiles;
   public GameObject chestTile;
 
+  //--------3D----------------------
+  public GameObject[] floorTiles3D;
+  public GameObject[] outerWallTiles3D;
+
   //endless
   private Transform boardHolder;
   private Dictionary<Vector2, Vector2> gridPositions = 
@@ -50,7 +54,7 @@ public class BoardManager : MonoBehaviour
     for(int x = 0; x < columns; x++) {
       for(int y = 0; y < rows; y++) {
         gridPositions.Add(new Vector2(x, y), new Vector2(x, y));
-        GameManager.instance.InstanceTile(new Vector2(x, y), floorTiles[Random.Range(0, floorTiles.Length)], 
+        GameManager.instance.InstanceTile(new Vector3(x, y), floorTiles[Random.Range(0, floorTiles.Length)], 
           boardHolder);
       }
     }
@@ -122,8 +126,6 @@ public class BoardManager : MonoBehaviour
     }
   }
 
-  
-
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int width, int height, Vector2 endpos) {
 
@@ -132,24 +134,33 @@ public class BoardManager : MonoBehaviour
     
     //floor
     foreach(KeyValuePair<Vector2, TileType> tile in dungeonTiles) {
-      GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
+      /*GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
+        dungeonBoardHolder);*/
+
+      //3D
+      GameManager.instance.InstanceTile(new Vector3(tile.Key.x, 0, tile.Key.y), floorTiles3D[Random.Range(0, floorTiles3D.Length)],
         dungeonBoardHolder);
 
       //chest
-      if(tile.Value == TileType.chest) {
-        GameManager.instance.InstanceTile(new Vector2(tile.Key.x, tile.Key.y), chestTile,
+      if (tile.Value == TileType.chest) {
+        GameManager.instance.InstanceTile(tile.Key, chestTile,
           dungeonBoardHolder);
       }
     }
 
-    //borders //TODO some errors with the BSP
+    //borders
     for (int x = -1; x < width + 1; x++) {
       for (int y = -1; y < height + 1; y++) {
         if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
             CheckBorders(new Vector2(x, y), dungeonTiles)) {
 
-          GameManager.instance.InstanceTile(new Vector2(x, y),
-            outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
+          //GameManager.instance.InstanceTile(new Vector2(x, y),
+          //  outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
+
+          //3D
+          float posY = outerWallTiles3D[0].transform.localScale.y / 2;
+          GameManager.instance.InstanceTile(new Vector3(x, posY, y),
+            outerWallTiles3D[Random.Range(0, outerWallTiles3D.Length)], dungeonBoardHolder);
         }
       }
     }

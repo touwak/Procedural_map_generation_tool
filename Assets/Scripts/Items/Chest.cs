@@ -28,7 +28,7 @@ public class Chest : MonoBehaviour {
       toInstantiate = weapon.gameObject;
     }
 
-    GameManager.instance.InstanceTile(new Vector2(transform.position.x, transform.position.y),
+    GameManager.instance.InstanceTile(new Vector3(transform.position.x, transform.position.y),
       toInstantiate, transform.parent);
 
     gameObject.layer = 11;

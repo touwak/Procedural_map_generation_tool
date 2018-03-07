@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 	public int healthPoints = 100;							   
 	public static GameManager instance = null;				
 	[HideInInspector] public bool playersTurn = true;
+  //public bool is3D;
   
 
   private BoardManager boardScript;         
@@ -46,8 +47,8 @@ public class GameManager : MonoBehaviour
 	void InitGame()	{
 
     //boardScript.BoardSetup();
-    //EnterDungeon();
-    EnterBSPDungeon();
+    EnterDungeon();
+    //EnterBSPDungeon();
     //EnterAutomataCave();
     //enemies.Clear();
   }
@@ -118,11 +119,13 @@ public class GameManager : MonoBehaviour
   }
 
   //TODO MOVE IT TO A BETTER PLACE
-  public void InstanceTile(Vector2 position, GameObject tile, Transform parent) {
+  public void InstanceTile(Vector3 position, GameObject tile, Transform parent) {
     GameObject toInstantiate = tile;
-    GameObject instance = Instantiate(toInstantiate,
-      new Vector3(position.x, position.y, 0f), Quaternion.identity) as GameObject;
+    GameObject instance = Instantiate(toInstantiate, 
+      position, Quaternion.identity) as GameObject;
 
     instance.transform.SetParent(parent);
   }
+
+
 }
