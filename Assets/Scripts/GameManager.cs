@@ -120,6 +120,8 @@ public class GameManager : MonoBehaviour
 
   //TODO MOVE IT TO A BETTER PLACE
   public void InstanceTile(Vector3 position, GameObject tile, Transform parent) {
+
+
     GameObject toInstantiate = tile;
     GameObject instance = Instantiate(toInstantiate, 
       position, Quaternion.identity) as GameObject;
@@ -127,5 +129,15 @@ public class GameManager : MonoBehaviour
     instance.transform.SetParent(parent);
   }
 
+  public void InstanceTile(Vector3 position, GameObject tile, 
+    Transform parent, Quaternion rotation) {
+
+
+    GameObject toInstantiate = tile;
+    GameObject instance = Instantiate(toInstantiate,
+      position, rotation) as GameObject;
+
+    instance.transform.SetParent(parent);
+  }
 
 }

@@ -31,6 +31,9 @@ public class BoardManager : MonoBehaviour
   //--------3D----------------------
   public GameObject[] floorTiles3D;
   public GameObject[] outerWallTiles3D;
+  public GameObject chestTile3D;
+
+  private float chestDir = 0;
 
   //endless
   private Transform boardHolder;
@@ -129,11 +132,15 @@ public class BoardManager : MonoBehaviour
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int width, int height, Vector2 endpos) {
 
+    float floorLevel = floorTiles3D[0].transform.localScale.y;
+
     //boardHolder.gameObject.SetActive(false);
     dungeonBoardHolder = new GameObject("Dungeon").transform;
     
     //floor
     foreach(KeyValuePair<Vector2, TileType> tile in dungeonTiles) {
+
+      //2D
       /*GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
         dungeonBoardHolder);*/
 
@@ -143,8 +150,16 @@ public class BoardManager : MonoBehaviour
 
       //chest
       if (tile.Value == TileType.chest) {
-        GameManager.instance.InstanceTile(tile.Key, chestTile,
-          dungeonBoardHolder);
+        //2D
+        /*GameManager.instance.InstanceTile(tile.Key, chestTile,
+          dungeonBoardHolder);*/
+
+        //3D
+        CheckBorders(tile.Key, dungeonTiles);
+        Vector3 rotation = new Vector3(0, chestDir, 0);
+        chestTile3D.transform.Rotate(rotation);
+        GameManager.instance.InstanceTile(new Vector3(tile.Key.x, floorLevel, tile.Key.y), 
+          chestTile3D, dungeonBoardHolder);
       }
     }
 
@@ -153,12 +168,13 @@ public class BoardManager : MonoBehaviour
       for (int y = -1; y < height + 1; y++) {
         if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
             CheckBorders(new Vector2(x, y), dungeonTiles)) {
-
+          
+          //2D
           //GameManager.instance.InstanceTile(new Vector2(x, y),
           //  outerWallTiles[Random.Range(0, outerWallTiles.Length)], dungeonBoardHolder);
 
           //3D
-          float posY = outerWallTiles3D[0].transform.localScale.y / 2;
+          float posY = (outerWallTiles3D[0].transform.localScale.y / 2) - 0.5f;
           GameManager.instance.InstanceTile(new Vector3(x, posY, y),
             outerWallTiles3D[Random.Range(0, outerWallTiles3D.Length)], dungeonBoardHolder);
         }
@@ -172,18 +188,22 @@ public class BoardManager : MonoBehaviour
   private bool CheckBorders(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles) {
     //right
     if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y))){
+      chestDir = 0;
       return true;
     }
     //top
     else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1))) {
+      chestDir = 270;
       return true;
     }
     //left
     else if(dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y))) {
+      chestDir = 180;
       return true;
     }
     //bottom
     else if(dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+      chestDir = 90;
       return true;
     }
 
