@@ -8,7 +8,8 @@ public enum TileType {
   essential,
   random,
   empty,
-  chest
+  chest,
+  outerWall
 }
 
 public class DungeonManager : MonoBehaviour {

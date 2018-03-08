@@ -33,7 +33,7 @@ public class BoardManager : MonoBehaviour
   public GameObject[] outerWallTiles3D;
   public GameObject chestTile3D;
 
-  private float chestDir = 0;
+  private float chestDir = 270;
 
   //endless
   private Transform boardHolder;
@@ -132,42 +132,44 @@ public class BoardManager : MonoBehaviour
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int width, int height, Vector2 endpos) {
 
-    float floorLevel = floorTiles3D[0].transform.localScale.y;
+    float floorLevel = (floorTiles3D[0].transform.localScale.y / 2);
 
     //boardHolder.gameObject.SetActive(false);
     dungeonBoardHolder = new GameObject("Dungeon").transform;
     
-    //floor
+    //-----------------------------FLOOR-----------------------------
     foreach(KeyValuePair<Vector2, TileType> tile in dungeonTiles) {
 
-      //2D
+      // 2D
       /*GameManager.instance.InstanceTile(tile.Key, floorTiles[Random.Range(0, floorTiles.Length)], 
         dungeonBoardHolder);*/
 
-      //3D
+      // 3D
       GameManager.instance.InstanceTile(new Vector3(tile.Key.x, 0, tile.Key.y), floorTiles3D[Random.Range(0, floorTiles3D.Length)],
         dungeonBoardHolder);
 
-      //chest
+      //--------------------------CHEST--------------------------------
       if (tile.Value == TileType.chest) {
-        //2D
+        // 2D
         /*GameManager.instance.InstanceTile(tile.Key, chestTile,
           dungeonBoardHolder);*/
 
-        //3D
-        CheckBorders(tile.Key, dungeonTiles);
+        // 3D
+        CheckNeighbours(tile.Key, dungeonTiles, false);
         Vector3 rotation = new Vector3(0, chestDir, 0);
-        chestTile3D.transform.Rotate(rotation);
+        Quaternion chestRotation = Quaternion.Euler(rotation);
         GameManager.instance.InstanceTile(new Vector3(tile.Key.x, floorLevel, tile.Key.y), 
-          chestTile3D, dungeonBoardHolder);
+          chestTile3D, dungeonBoardHolder, chestRotation);
+
+        chestDir = 270;
       }
     }
 
-    //borders
+    //--------------------------BORDERS------------------------------
     for (int x = -1; x < width + 1; x++) {
       for (int y = -1; y < height + 1; y++) {
         if (!dungeonTiles.ContainsKey(new Vector2(x, y)) &&
-            CheckBorders(new Vector2(x, y), dungeonTiles)) {
+            CheckNeighbours(new Vector2(x, y), dungeonTiles)) {
           
           //2D
           //GameManager.instance.InstanceTile(new Vector2(x, y),
@@ -181,29 +183,29 @@ public class BoardManager : MonoBehaviour
       }
     }
 
-    //exit
+    //--------------------EXIT----------------------------------------------
     GameManager.instance.InstanceTile(endpos, exit, dungeonBoardHolder);
   }
 
-  private bool CheckBorders(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles) {
+  private bool CheckNeighbours(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles, bool isFill = true) {
     //right
-    if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y))){
-      chestDir = 0;
-      return true;
-    }
-    //top
-    else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1))) {
+    if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) == isFill){
       chestDir = 270;
       return true;
     }
-    //left
-    else if(dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y))) {
+    //top
+    else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1)) == isFill) {
       chestDir = 180;
       return true;
     }
-    //bottom
-    else if(dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1))) {
+    //left
+    else if(dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y)) == isFill) {
       chestDir = 90;
+      return true;
+    }
+    //bottom
+    else if(dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1)) == isFill) {
+      chestDir = 0;
       return true;
     }
 
