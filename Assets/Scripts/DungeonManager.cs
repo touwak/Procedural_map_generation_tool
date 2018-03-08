@@ -210,7 +210,9 @@ public class DungeonManager : MonoBehaviour {
           chamberTilePos.x < maxBound && chamberTilePos.x > 0 &&
           chamberTilePos.y < maxBound && chamberTilePos.y > 0) {
           
-          if(Random.Range(0, 70) == 1) {
+          if(Random.Range(0, 70) == 1 /*&& 
+            !CheckNeighboursType(chamberTilePos, TileType.chest, gridPositions)*/) {
+
             gridPositions.Add(chamberTilePos, TileType.chest);
           }
           else {
@@ -220,4 +222,28 @@ public class DungeonManager : MonoBehaviour {
       }
     }
   }
+
+  // TODO FIX THIS
+  //private bool CheckNeighboursType(Vector2 pos, TileType type, Dictionary<Vector2, TileType> dungeonTiles) {
+  //  //right
+  //  if (dungeonTiles[new Vector2(pos.x + 1, pos.y)] == type) {
+  //    return true;
+  //  }
+  //  //top
+  //  else if (dungeonTiles[new Vector2(pos.x, pos.y + 1)] == type) {
+  //    return true;
+  //  }
+  //  //left
+  //  else if (dungeonTiles[new Vector2(pos.x - 1, pos.y)] == type) {
+  //    return true;
+  //  }
+  //  //bottom
+  //  else if (dungeonTiles[new Vector2(pos.x, pos.y - 1)] == type) {
+  //    return true;
+  //  }
+
+  //  return false;
+  //}
+
+
 }
