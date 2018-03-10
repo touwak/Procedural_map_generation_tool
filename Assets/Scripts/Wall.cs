@@ -18,10 +18,10 @@ public class Wall : MonoBehaviour {
     hp -= loss;
 
     if (hp <= 0) {
-      if (Random.Range(0, 5) == 1) {
+      /*if (Random.Range(0, 5) == 1) {
         GameObject food = foodTiles[Random.Range(0, foodTiles.Length)];
         GameManager.instance.InstanceTile(transform.position, food, transform.parent);
-      }
+      }*/
 
       gameObject.SetActive(false);
     }

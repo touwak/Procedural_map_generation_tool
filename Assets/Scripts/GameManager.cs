@@ -46,8 +46,8 @@ public class GameManager : MonoBehaviour
 
 	void InitGame()	{
 
-    //boardScript.BoardSetup();
-    EnterDungeon();
+    boardScript.BoardSetup();
+    //EnterDungeon();
     //EnterBSPDungeon();
     //EnterAutomataCave();
     //enemies.Clear();
