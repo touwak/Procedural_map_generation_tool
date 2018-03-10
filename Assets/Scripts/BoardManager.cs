@@ -29,7 +29,7 @@ public class BoardManager : MonoBehaviour
   public GameObject chestTile;
   public bool is2D;
 
-  //--------3D----------------------
+  //--------------3D----------------------
   public GameObject[] floorTiles3D;
   public GameObject[] wallTiles3D;
   public GameObject[] outerWallTiles3D;
@@ -129,6 +129,7 @@ public class BoardManager : MonoBehaviour
     if (!gridPositions.ContainsKey(tileToAdd)) {
       gridPositions.Add(tileToAdd, tileToAdd);
 
+      //----------------------FLOOR-----------------------
       //2D
       if (is2D) {
         GameManager.instance.InstanceTile(tileToAdd, floorTiles[Random.Range(0, floorTiles.Length)],
@@ -140,22 +141,33 @@ public class BoardManager : MonoBehaviour
           boardHolder);
       }
 
-      //choose at random a wall tile to lay
+      //-------------------BREAKABLE WALLS-------------------
       if(Random.Range(0, 3) == 1) {
         if (is2D) {
           GameManager.instance.InstanceTile(tileToAdd, wallTiles[Random.Range(0, floorTiles.Length)],
             boardHolder);
         }
         else {
-          GameManager.instance.InstanceTile(new Vector3(tileToAdd.x, floorLevel, tileToAdd.y), wallTiles3D[Random.Range(0, floorTiles3D.Length)],
+          GameManager.instance.InstanceTile(new Vector3(tileToAdd.x, floorLevel, tileToAdd.y), wallTiles3D[Random.Range(0, wallTiles3D.Length)],
             boardHolder);
         }
       }
     }
 
     //exit tile
-    if(Random.Range(0, 50) == 1) {
-      GameManager.instance.InstanceTile(tileToAdd, exit, boardHolder);
+    if(Random.Range(0, 75) == 1) {
+      //2D
+      if (is2D) {
+        GameManager.instance.InstanceTile(tileToAdd, exit, boardHolder);
+      }
+      else {
+        //3D
+        floorLevel -= 0.5f;
+        GameManager.instance.InstanceTile(new Vector3(tileToAdd.x, floorLevel, tileToAdd.y), 
+          exit3D, boardHolder);
+
+        floorLevel += 0.5f;
+      }
     }
   }
 
