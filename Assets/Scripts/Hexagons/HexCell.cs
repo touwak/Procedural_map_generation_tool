@@ -7,13 +7,15 @@ public class HexCell : MonoBehaviour {
   public HexCoordinates coordinates;
   public Color color;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+  [SerializeField]
+  private HexCell[] neightbors;
+
+  public HexCell GetNeighbor(HexDirection direction) {
+    return neightbors[(int)direction];
+  }
+
+  public void SetNeighbor(HexDirection direction, HexCell cell) {
+    neightbors[(int)direction] = cell;
+    cell.neightbors[(int)direction.Opposite()] = this;
+  }
 }

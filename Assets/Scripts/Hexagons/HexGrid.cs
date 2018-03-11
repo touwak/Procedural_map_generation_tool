@@ -53,6 +53,28 @@ public class HexGrid : MonoBehaviour {
     cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
     cell.color = defaultColor;
 
+    // --------------NEIGHBORS-------------------
+    if(x > 0) {
+      cell.SetNeighbor(HexDirection.W, cells[i - 1]);
+    }
+    if(z > 0) {
+
+      // even
+      if((z & 1) == 0) {
+        cell.SetNeighbor(HexDirection.SE, cells[i - width]);
+
+        if(x > 0) {
+          cell.SetNeighbor(HexDirection.SW, cells[i - width - 1]);
+        }
+      }
+      else { // odd
+        cell.SetNeighbor(HexDirection.SW, cells[i - width]);
+        if(x < width - 1) {
+          cell.SetNeighbor(HexDirection.SE, cells[i - width + 1]);
+        }
+      }
+    }
+
     // label
     Text label = Instantiate<Text>(cellLabelPrefab);
     label.rectTransform.SetParent(gridCanvas.transform, false);
