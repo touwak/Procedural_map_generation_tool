@@ -6,11 +6,16 @@ using UnityEngine;
 public class HexMesh : MonoBehaviour {
 
   private Mesh hexMesh;
+  private MeshCollider meshCollider;
   private List<Vector3> vertices;
   private List<int> triangles;
+  private List<Color> colors;
 
   private void Awake() {
     GetComponent<MeshFilter>().mesh = hexMesh = new Mesh();
+    meshCollider = gameObject.AddComponent<MeshCollider>();
+    colors = new List<Color>();
+
     hexMesh.name = "HexMesh";
     vertices = new List<Vector3>();
     triangles = new List<int>();
@@ -20,6 +25,7 @@ public class HexMesh : MonoBehaviour {
     hexMesh.Clear();
     vertices.Clear();
     triangles.Clear();
+    colors.Clear();
 
     for(int i = 0; i < cells.Length; i++) {
       Triangulate(cells[i]);
@@ -28,6 +34,9 @@ public class HexMesh : MonoBehaviour {
     hexMesh.vertices = vertices.ToArray();
     hexMesh.triangles = triangles.ToArray();
     hexMesh.RecalculateNormals();
+    hexMesh.colors = colors.ToArray();
+
+    meshCollider.sharedMesh = hexMesh;
   }
 
   //create the 6 triangles that form the hex
@@ -37,6 +46,7 @@ public class HexMesh : MonoBehaviour {
     for (int i = 0; i < 6; i++) {
       AddTriangle(center, center + HexMetrics.corners[i],
         center + HexMetrics.corners[i + 1]);
+      AddTriangleColor(cell.color);
     }
 
 
@@ -51,6 +61,12 @@ public class HexMesh : MonoBehaviour {
     triangles.Add(vertexIndex);
     triangles.Add(vertexIndex + 1);
     triangles.Add(vertexIndex + 2);
+  }
+
+  void AddTriangleColor(Color color) {
+    colors.Add(color);
+    colors.Add(color);
+    colors.Add(color);
   }
 
 }
