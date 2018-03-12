@@ -155,7 +155,7 @@ public class BoardManager : MonoBehaviour
     }
 
     //exit tile
-    if(Random.Range(0, 75) == 1) {
+    if(Random.Range(0, 75) == 1 /*&& !gridPositions.ContainsKey(tileToAdd)*/ ) {
       //2D
       if (is2D) {
         GameManager.instance.InstanceTile(tileToAdd, exit, boardHolder);
@@ -207,7 +207,7 @@ public class BoardManager : MonoBehaviour
           GameManager.instance.InstanceTile(new Vector3(tile.Key.x, floorLevel, tile.Key.y),
             chestTile3D, dungeonBoardHolder, chestRotation);
 
-          chestDir = 270;
+          chestDir = 270.0f;
         }
       }
     }
@@ -247,22 +247,22 @@ public class BoardManager : MonoBehaviour
   private bool CheckNeighbours(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles, bool isFill = true) {
     //right
     if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) == isFill){
-      chestDir = 270;
+      chestDir = 270f;
       return true;
     }
     //top
     else if (dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y + 1)) == isFill) {
-      chestDir = 180;
+      chestDir = 180f;
       return true;
     }
     //left
     else if(dungeonTiles.ContainsKey(new Vector2(pos.x - 1, pos.y)) == isFill) {
-      chestDir = 90;
+      chestDir = 90f;
       return true;
     }
     //bottom
     else if(dungeonTiles.ContainsKey(new Vector2(pos.x, pos.y - 1)) == isFill) {
-      chestDir = 0;
+      chestDir = 0f;
       return true;
     }
 

@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 	public int healthPoints = 100;							   
 	public static GameManager instance = null;				
 	[HideInInspector] public bool playersTurn = true;
-  //public bool is3D;
+  public int mode = 0;
   
 
   private BoardManager boardScript;         
@@ -44,11 +44,26 @@ public class GameManager : MonoBehaviour
     InitGame();
 	}
 
-	void InitGame()	{
+  void InitGame() {
 
-    boardScript.BoardSetup();
-    //EnterDungeon();
-    //EnterBSPDungeon();
+    switch (mode) {
+      case 0:
+        boardScript.BoardSetup();
+        break;
+
+      case 1:
+        EnterDungeon();
+        break;
+
+      case 2:
+        EnterBSPDungeon();
+        break;
+
+      default:
+        boardScript.BoardSetup();
+        break;
+    }
+
     //EnterAutomataCave();
     //enemies.Clear();
   }
