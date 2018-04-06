@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+enum OptionalToggle {
+  Ignore, Yes, No
+}
+
 public class HexMapEditor : MonoBehaviour {
 
   public Color[] colors;
@@ -13,6 +17,7 @@ public class HexMapEditor : MonoBehaviour {
   private bool applyColor;
   private bool applyElevation = true;
   private int brushSize;
+  private OptionalToggle riverMode;
 
   void Awake() {
     SelectColor(0);
@@ -85,5 +90,8 @@ public class HexMapEditor : MonoBehaviour {
     hexGrid.ShowUI(visible);
   }
 
+  public void SetRiverMode(int mode) {
+    riverMode = (OptionalToggle)mode;
+  }
 
 }
