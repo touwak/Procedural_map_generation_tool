@@ -142,6 +142,13 @@ public class HexCell : MonoBehaviour {
       hasOutgoingRiver && outgoingRiver == direction;
   }
 
+  public float StreamBedY {
+    get {
+      return (elevation + HexMetrics.streamBedElevationOffset) *
+        HexMetrics.elevationStep;
+    }
+  }
+
   //-------REMOVE RIVERS--------
 
   public void RemoveOutgoingRiver() {
