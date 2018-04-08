@@ -137,6 +137,14 @@ public class HexCell : MonoBehaviour {
     }
   }
 
+  public float RiverSurfaceY {
+    get {
+      return (elevation + 
+        HexMetrics.riverSurfaceElevationOffset) *
+        HexMetrics.elevationStep;
+    }
+  }
+
   public bool HasRiverThroughEdge(HexDirection direction) {
     return hasIncomingRiver && incomingRiver == direction ||
       hasOutgoingRiver && outgoingRiver == direction;

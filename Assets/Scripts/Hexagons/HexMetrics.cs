@@ -24,7 +24,7 @@ public class HexMetrics {
 
   // noise
   public static Texture2D noiseSource;
-  public const float cellPerturbStrength = 0; //4f;
+  public const float cellPerturbStrength = 4f;
   public const float noiseScale = 0.003f;
   public const float elevationPerturbStrengh = 1.5f;
 
@@ -32,7 +32,8 @@ public class HexMetrics {
   public const int chunkSizeX = 5, chunkSizeZ = 5;
 
   //river
-  public const float streamBedElevationOffset = -1f;
+  public const float streamBedElevationOffset = -1.75f;
+  public const float riverSurfaceElevationOffset = -0.5f;
 
   public static Vector3[] corners = {
     new Vector3(0f, 0f, outerRadius),
@@ -65,17 +66,17 @@ public class HexMetrics {
   }
 
   public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step) {
-    float h = step * HexMetrics.horizontalTerraceStepSize;
+    float h = step * horizontalTerraceStepSize;
     a.x += (b.x - a.x) * h;
     a.z += (b.z - a.z) * h;
-    float v = ((step + 1) / 2) * HexMetrics.verticalTerraceStepSize;
+    float v = ((step + 1) / 2) * verticalTerraceStepSize;
     a.y += (b.y - a.y) * v;
 
     return a;
   }
 
   public static Color TerraceLerp(Color a, Color b, int step) {
-    float h = step * HexMetrics.horizontalTerraceStepSize;
+    float h = step * horizontalTerraceStepSize;
     return Color.Lerp(a, b, h);
   }
 
@@ -99,11 +100,20 @@ public class HexMetrics {
 //--------------------NOISE-----------------------
 
 // return the color in a UV position
-public static Vector4 SampleNoise(Vector3 position) {
+  public static Vector4 SampleNoise(Vector3 position) {
     return noiseSource.GetPixelBilinear(
       position.x * noiseScale, 
       position.z * noiseScale
       );
+  }
+
+  // perturb the mesh using noise
+  public static Vector3 Perturb(Vector3 position) {
+    Vector4 sample = SampleNoise(position);
+    position.x += (sample.x * 2f - 1f) * cellPerturbStrength;
+    position.z += (sample.z * 2f - 1f) * cellPerturbStrength;
+
+    return position;
   }
 
 
