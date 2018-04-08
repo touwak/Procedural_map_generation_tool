@@ -396,21 +396,18 @@ public class HexMesh : MonoBehaviour {
         center += HexMetrics.GetSolidEdgeMiddle(direction) *
           (HexMetrics.innerToOuter * 0.5f);
       }
+      else if (cell.HasRiverThroughEdge(direction.Previous2())) {
+        center += HexMetrics.GetFirstSolidCorner(direction) * 0.25f;
+      }      
     }
-    else if (cell.HasRiverThroughEdge(direction.Previous2())) {
-      center += HexMetrics.GetFirstSolidCorner(direction) * 0.25f;
-    }
-    else if(
+    else if (
       cell.HasRiverThroughEdge(direction.Previous()) &&
-      cell.HasRiverThroughEdge(direction.Next2())) 
-      {
+      cell.HasRiverThroughEdge(direction.Next2())) {
       center += HexMetrics.GetSecondSolidCorner(direction) * 0.25f;
     }
 
     TriangulateEdgeStrip(m, cell.Color, e, cell.Color);
     TriangulateEdgeFan(center, m, cell.Color);
-
-
   }
 
 
