@@ -18,7 +18,7 @@ public class HexMapEditor : MonoBehaviour {
   private bool applyElevation = true;
   private int brushSize;
 
-  private OptionalToggle riverMode;
+  private OptionalToggle riverMode, roadMode;
   private bool isDrag;
   private HexDirection dragDirection;
   private HexCell previousCell;
@@ -82,11 +82,21 @@ public class HexMapEditor : MonoBehaviour {
       if(riverMode == OptionalToggle.No) {
         cell.RemoveRiver();
       }
-      else if(isDrag && riverMode == OptionalToggle.Yes) {
+      if(roadMode == OptionalToggle.No) {
+        cell.RemoveRoads();
+      }
+      if (isDrag) {
         HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
+         
         if (otherCell) {
-          previousCell.SetOutgoingRiver(dragDirection);
+          if (riverMode == OptionalToggle.Yes) {
+            otherCell.SetOutgoingRiver(dragDirection);
+          }
+          if(roadMode == OptionalToggle.Yes) {
+            otherCell.AddRoad(dragDirection);
+          }
         }
+        
       }
     }
   }
@@ -122,6 +132,10 @@ public class HexMapEditor : MonoBehaviour {
 
   public void SetRiverMode(int mode) {
     riverMode = (OptionalToggle)mode;
+  }
+
+  public void SetRoadMode(int mode) {
+    roadMode = (OptionalToggle)mode;
   }
 
   void ValidateDrag(HexCell currentCell) {
