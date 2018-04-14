@@ -24,7 +24,7 @@ public class HexMetrics {
 
   // noise
   public static Texture2D noiseSource;
-  public const float cellPerturbStrength = 0f;// 4f;
+  public const float cellPerturbStrength = 4f;
   public const float noiseScale = 0.003f;
   public const float elevationPerturbStrengh = 1.5f;
 
@@ -50,6 +50,11 @@ public class HexMetrics {
     new float[] {0.0f, 0.4f, 0.6f},
     new float[] {0.4f, 0.6f, 0.8f}
   };
+
+  // walls
+  public const float wallHeight = 3f;
+  public const float wallThickness = 0.75f;
+  public const float wallElevationOffset = verticalTerraceStepSize;
 
   public static Vector3[] corners = {
     new Vector3(0f, 0f, outerRadius),
@@ -180,5 +185,25 @@ public class HexMetrics {
     return featureThresholds[level];
   }
 
-  
+  //----------------------WALLS---------------------------
+
+  public static Vector3 WallThicknessOffset(Vector3 near, Vector3 far) {
+    Vector3 offset;
+    offset.x = far.x - near.x;
+    offset.y = 0f;
+    offset.z = far.z - near.z;
+
+    return offset.normalized * (wallThickness * 0.5f);
+  }
+
+  public static Vector3 WallLerp(Vector3 near, Vector3 far) {
+    near.x += (far.x - near.x) * 0.5f;
+    near.z += (far.z - near.z) * 0.5f;
+
+    float v =
+      near.y < far.y ? wallElevationOffset : (1f - wallElevationOffset);
+    near.y += (far.y - near.y) * v;
+    return near;
+  }
+
 }

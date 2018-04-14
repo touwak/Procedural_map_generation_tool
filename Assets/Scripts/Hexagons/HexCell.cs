@@ -24,6 +24,9 @@ public class HexCell : MonoBehaviour {
   //features
   private int urbanLevel, farmLevel, plantLevel;
 
+  // wall
+  private bool walled;
+
   public int Elevation {
     get {
       return elevation;
@@ -367,6 +370,20 @@ public class HexCell : MonoBehaviour {
     set {
       if(farmLevel != value) {
         plantLevel = value;
+        RefreshSelfOnly();
+      }
+    }
+  }
+
+  //-------------------------WALLS----------------------------
+
+  public bool Walled {
+    get {
+      return walled;
+    }
+    set {
+      if(walled != value) {
+        walled = value;
         RefreshSelfOnly();
       }
     }
