@@ -52,9 +52,16 @@ public class HexMetrics {
   };
 
   // walls
-  public const float wallHeight = 3f;
+  public const float wallHeight = 4f;
   public const float wallThickness = 0.75f;
   public const float wallElevationOffset = verticalTerraceStepSize;
+  public const float wallYOffset = -1f;
+
+  // tower
+  public const float wallTowerThreshold = 0.5f;
+
+  // bridge
+  public const float bridgeDesignLength = 7f;
 
   public static Vector3[] corners = {
     new Vector3(0f, 0f, outerRadius),
@@ -202,7 +209,7 @@ public class HexMetrics {
 
     float v =
       near.y < far.y ? wallElevationOffset : (1f - wallElevationOffset);
-    near.y += (far.y - near.y) * v;
+    near.y += (far.y - near.y) * v + wallYOffset;
     return near;
   }
 

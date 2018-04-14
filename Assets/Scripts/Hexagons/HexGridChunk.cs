@@ -620,10 +620,10 @@ public class HexGridChunk : MonoBehaviour {
         cell.RiverBeginOrEndDirection.Opposite()) *
         (1f / 3f);
     }
-    else if(cell.IncomingRiver == cell.OutgoingRiver.Opposite()) {
+    else if (cell.IncomingRiver == cell.OutgoingRiver.Opposite()) {
       Vector3 corner;
       if (previousHasRiver) {
-        if(!hasRoadTrhoughEdge &&
+        if (!hasRoadTrhoughEdge &&
           !cell.HasRoadThroughEdge(direction.Next())) {
           return;
         }
@@ -637,9 +637,15 @@ public class HexGridChunk : MonoBehaviour {
         corner = HexMetrics.GetFirstSolidCorner(direction);
       }
       roadCenter += corner * 0.5f;
+      // bridge
+      if (cell.IncomingRiver == direction.Next() /*&&
+        cell.HasRoadThroughEdge(direction.Next2()) ||
+        cell.HasRoadThroughEdge(direction.Opposite())*/) {
+        features.AddBridge(roadCenter, center - corner * 0.5f);
+      }
       center += corner * 0.25f;
     }
-    else if(cell.IncomingRiver == cell.OutgoingRiver.Previous()) { //zigzag river
+    else if (cell.IncomingRiver == cell.OutgoingRiver.Previous()) { //zigzag river
       roadCenter -= HexMetrics.GetSecondCorner(cell.IncomingRiver) * 0.2f;
     }
     else if (cell.IncomingRiver == cell.OutgoingRiver.Next()) {   //zigzag river
@@ -666,16 +672,21 @@ public class HexGridChunk : MonoBehaviour {
         middle = direction;
       }
 
-      if(!cell.HasRoadThroughEdge(middle) &&
+      if (!cell.HasRoadThroughEdge(middle) &&
         !cell.HasRoadThroughEdge(middle.Previous()) &&
         !cell.HasRoadThroughEdge(middle.Previous())) {
         return;
       }
 
-      roadCenter += HexMetrics.GetSolidEdgeMiddle(middle) * 0.25f;
+      Vector3 offset = HexMetrics.GetSolidEdgeMiddle(middle);
+      roadCenter += offset * 0.25f;
+      // bridge
+      if (direction == middle &&
+        cell.HasRoadThroughEdge(direction.Opposite())) { 
+        features.AddBridge(roadCenter,
+          center - offset * (HexMetrics.innerToOuter * 0.7f));
+      }
     }
-
-    
 
     Vector3 mL = Vector3.Lerp(roadCenter, e.v1, interpolators.x);
     Vector3 mR = Vector3.Lerp(roadCenter, e.v5, interpolators.y);
