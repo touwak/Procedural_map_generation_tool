@@ -43,15 +43,7 @@ public class HexCell : MonoBehaviour {
 
       //check that the rivers flow in the correct direction when
       //the elevation of a cell change
-      if(hasOutgoingRiver &&
-        elevation < GetNeighbor(outgoingRiver).elevation) {
-        RemoveOutgoingRiver();
-      }
-
-      if(hasIncomingRiver && 
-        elevation > GetNeighbor(incomingRiver).elevation) {
-        RemoveIncomingRiver();
-      }
+      ValidateRivers();
 
       //if the differnce is bigger than the allowed remove the roads
       for(int i = 0; i < roads.Length; i++) {
@@ -184,6 +176,23 @@ public class HexCell : MonoBehaviour {
     }
   }
 
+  bool IsValidRiverDestination(HexCell neighbour) {
+    return neighbour && (
+      elevation >= neighbour.elevation || waterLevel == neighbour.elevation);
+  }
+
+  void ValidateRivers() {
+    if(hasOutgoingRiver &&
+      !IsValidRiverDestination(GetNeighbor(outgoingRiver))) {
+      RemoveOutgoingRiver();
+    }
+    if(hasIncomingRiver &&
+      !GetNeighbor(incomingRiver).IsValidRiverDestination(this)) {
+      RemoveIncomingRiver();
+    }
+  }
+
+
   //-------REMOVE RIVERS--------
 
   public void RemoveOutgoingRiver() {
@@ -229,7 +238,7 @@ public class HexCell : MonoBehaviour {
     }
 
     HexCell neigbour = GetNeighbor(direction);
-    if(!neigbour || elevation < neigbour.elevation) {
+    if(!IsValidRiverDestination(neigbour)) {
       return;
     }
 
@@ -303,6 +312,7 @@ public class HexCell : MonoBehaviour {
         return;
       }
       waterLevel = value;
+      ValidateRivers();
       Refresh();
     }
   }
