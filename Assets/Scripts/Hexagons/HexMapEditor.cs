@@ -27,7 +27,9 @@ public class HexMapEditor : MonoBehaviour {
 
   //features
   private int activeUrbanLevel, activeFarmLevel, activePlantLevel;
-  bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
+  private int activeSpecialIndex;
+  private bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
+  private bool applySpecialIndex;
 
   void Awake() {
     SelectColor(0);
@@ -99,6 +101,10 @@ public class HexMapEditor : MonoBehaviour {
 
       if (applyPlantLevel) {
         cell.PlantLevel = activePlantLevel;
+      }
+
+      if (applySpecialIndex) {
+        cell.SpecialIndex = activeSpecialIndex;
       }
 
       if(riverMode == OptionalToggle.No) {
@@ -208,6 +214,14 @@ public class HexMapEditor : MonoBehaviour {
 
   public void SetWalledMode(int mode) {
     walledMode = (OptionalToggle)mode;
+  }
+
+  public void SetApplySpecialIndex(bool toggle) {
+    applySpecialIndex = toggle;
+  }
+
+  public void SetSpecialIndex(float index) {
+    activeSpecialIndex = (int)index;
   }
 
 }

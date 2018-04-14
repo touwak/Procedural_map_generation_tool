@@ -27,6 +27,9 @@ public class HexCell : MonoBehaviour {
   // wall
   private bool walled;
 
+  // special
+  int specialIndex;
+
   public int Elevation {
     get {
       return elevation;
@@ -255,10 +258,12 @@ public class HexCell : MonoBehaviour {
 
     hasOutgoingRiver = true;
     outgoingRiver = direction;
+    specialIndex = 0;
 
     neigbour.RemoveIncomingRiver();
     neigbour.hasIncomingRiver = true;
     neigbour.incomingRiver = direction.Opposite();
+    neigbour.SpecialIndex = 0;
 
     SetRoad((int)direction, false);
   }
@@ -302,6 +307,7 @@ public class HexCell : MonoBehaviour {
 
   public void AddRoad(HexDirection direction) {
     if (!roads[(int)direction] && !HasRiverThroughEdge(direction) &&
+      !IsSpecial && !GetNeighbor(direction).IsSpecial &&
       GetElevationDifference(direction) <= 1) {
       SetRoad((int)direction, true);
     }
@@ -388,5 +394,28 @@ public class HexCell : MonoBehaviour {
       }
     }
   }
+
+  //----------------------SPECIALS--------------------------
+
+  public int SpecialIndex {
+    get {
+      return specialIndex;
+    }
+    set {
+      if (specialIndex != value && !HasRiver) {
+        specialIndex = value;
+        RemoveRoads();
+        RefreshSelfOnly();
+      }
+    }
+  }
+
+  public bool IsSpecial {
+    get {
+      return specialIndex > 0;
+    }
+  }
+
+
 
 }
