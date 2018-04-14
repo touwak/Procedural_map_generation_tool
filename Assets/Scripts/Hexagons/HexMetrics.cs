@@ -28,16 +28,28 @@ public class HexMetrics {
   public const float noiseScale = 0.003f;
   public const float elevationPerturbStrengh = 1.5f;
 
-  //chunk
+  // chunk
   public const int chunkSizeX = 5, chunkSizeZ = 5;
 
-  //river
+  // river
   public const float streamBedElevationOffset = -1.75f;
   public const float waterElevationOffset = -0.5f;
 
-  //water
+  // water
   public const float waterFactor = 0.6f;
   public const float waterBlendFactor = 1f - waterFactor;
+
+  // hash grid
+  public const int hashGridSize = 256;
+  public const float hashGridScale = 0.25f;
+  static HexHash[] hashGrid;
+
+  // features
+  static float[][] featureThresholds = {
+    new float[] {0.0f, 0.0f, 0.4f},
+    new float[] {0.0f, 0.4f, 0.6f},
+    new float[] {0.4f, 0.6f, 0.8f}
+  };
 
   public static Vector3[] corners = {
     new Vector3(0f, 0f, outerRadius),
@@ -135,4 +147,38 @@ public class HexMetrics {
       waterBlendFactor;
   }
 
+  //--------------HASH GRID-----------------------
+
+  public static void InitializeHashGrid(int seed) {
+    hashGrid = new HexHash[hashGridSize * hashGridSize];
+    Random.State currentState = Random.state;
+    Random.InitState(seed);
+
+    for(int i = 0; i < hashGrid.Length; i++) {
+      hashGrid[i] = HexHash.Create();
+    }
+    Random.state = currentState;
+  }
+
+  public static HexHash SampleHashGrid(Vector3 position) {
+    int x = (int)(position.x * hashGridScale) % hashGridSize;
+    if(x < 0) {
+      x += hashGridSize;
+    }
+
+    int z= (int)(position.z * hashGridScale) % hashGridSize;
+    if(z < 0) {
+      z += hashGridSize;
+    }
+
+    return hashGrid[x + z * hashGridSize];
+  }
+
+  //-----------------------FEATURES---------------------------
+
+  public static float[]  GetFeaturesThresholds(int level) {
+    return featureThresholds[level];
+  }
+
+  
 }

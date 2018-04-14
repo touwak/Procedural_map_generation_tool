@@ -21,6 +21,9 @@ public class HexCell : MonoBehaviour {
   //water
   private int waterLevel;
 
+  //features
+  private int urbanLevel, farmLevel, plantLevel;
+
   public int Elevation {
     get {
       return elevation;
@@ -328,6 +331,44 @@ public class HexCell : MonoBehaviour {
       return
         (waterLevel + HexMetrics.waterElevationOffset) *
         HexMetrics.elevationStep;
+    }
+  }
+
+  //-----------------FEATURES--------------------------
+
+  public int UrbanLevel {
+    get {
+      return urbanLevel;
+    }
+    set {
+      if(urbanLevel != value) {
+        urbanLevel = value;
+        RefreshSelfOnly();
+      }
+    }
+  }
+
+  public int FarmLevel {
+    get {
+      return farmLevel;
+    }
+    set {
+      if(farmLevel != value) {
+        farmLevel = value;
+        RefreshSelfOnly();
+      }
+    }
+  }
+
+  public int PlantLevel {
+    get {
+      return plantLevel;
+    }
+    set {
+      if(farmLevel != value) {
+        plantLevel = value;
+        RefreshSelfOnly();
+      }
     }
   }
 
