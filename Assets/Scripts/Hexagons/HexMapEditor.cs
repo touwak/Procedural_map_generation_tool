@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.IO;
+using UnityEngine.UI;
 
 enum OptionalToggle {
   Ignore, Yes, No
@@ -9,13 +11,10 @@ enum OptionalToggle {
 
 public class HexMapEditor : MonoBehaviour {
 
-  public Color[] colors;
   public HexGrid hexGrid;
 
-  private Color activeColor;
   private int activeElevation;
   private int activeWaterLevel;
-  private bool applyColor;
   private bool applyElevation = true;
   private bool applyWaterLevel = true;
   private int brushSize;
@@ -31,11 +30,20 @@ public class HexMapEditor : MonoBehaviour {
   private bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
   private bool applySpecialIndex;
 
-  void Awake() {
-    SelectColor(0);
+  // save
+  int activeTerrainTypeIndex;
+  public Button saveButton, loadButton;
+
+  private void Start() {
+    Button btnSave = saveButton.GetComponent<Button>();
+    btnSave.onClick.AddListener(Save);
+
+    Button btnLoad = loadButton.GetComponent<Button>();
+    btnLoad.onClick.AddListener(Load);
   }
-	
-	void Update () {
+
+
+  void Update () {
     if (Input.GetMouseButton(0) &&
       !EventSystem.current.IsPointerOverGameObject()) {
       HandleInput();
@@ -66,12 +74,6 @@ public class HexMapEditor : MonoBehaviour {
     }
   }
 
-  public void SelectColor(int index) {
-    applyColor = index >= 0;
-    if (applyColor) {
-      activeColor = colors[index];
-    }
-  }
 
   public void SetElevation(float elevation) {
     activeElevation = (int)elevation;
@@ -79,8 +81,8 @@ public class HexMapEditor : MonoBehaviour {
 
   void EditCell(HexCell cell) {
     if (cell) {
-      if (applyColor) {
-        cell.Color = activeColor;
+      if(activeTerrainTypeIndex >= 0) {
+        cell.TerrainTypeIndex = activeTerrainTypeIndex;
       }
 
       if (applyElevation) {
@@ -222,6 +224,38 @@ public class HexMapEditor : MonoBehaviour {
 
   public void SetSpecialIndex(float index) {
     activeSpecialIndex = (int)index;
+  }
+
+  public void SetTerrainTypeIndex(int index) {
+    activeTerrainTypeIndex = index;
+  }
+
+  //---------------------SAVE---------------------------
+
+  public void Save() {
+    string path = Path.Combine(Application.persistentDataPath, "test.map");
+
+    using (
+    BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create))
+    ) {
+      writer.Write(0);
+      hexGrid.Save(writer);
+    }
+  }
+
+  public void Load() {
+    string path = Path.Combine(Application.persistentDataPath, "test.map");
+    using (
+      BinaryReader reader = new BinaryReader(File.OpenRead(path))
+    ) {
+      int header = reader.ReadInt32();
+      if (header == 0) {
+        hexGrid.Load(reader);
+      }
+      else {
+        Debug.LogWarning("Unknown map format " + header);
+      }
+    }
   }
 
 }
