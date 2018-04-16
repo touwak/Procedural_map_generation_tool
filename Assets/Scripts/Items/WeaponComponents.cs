@@ -17,7 +17,7 @@ public class WeaponComponents : MonoBehaviour {
 	}
 	
 	void Update () {
-    //transform.eulerAngles = parent.transform.eulerAngles;
+    transform.eulerAngles = parent.transform.eulerAngles;
 	}
 
   public SpriteRenderer GetSpriteRender() {

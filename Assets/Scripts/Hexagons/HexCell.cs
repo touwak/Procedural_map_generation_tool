@@ -34,6 +34,9 @@ public class HexCell : MonoBehaviour {
   // save
   int terrainTypeIndex;
 
+  // distance
+  int distance;
+
   public int Elevation {
     get {
       return elevation;
@@ -496,5 +499,34 @@ public class HexCell : MonoBehaviour {
     }
   }
 
+  //------------------DISTANCE---------------------
+
+  public int Distance {
+    get {
+      return distance;
+    }
+    set {
+      distance = value;
+    }
+  }
+
+  public int SearchPhase { get; set; }
+
+  //public void FindDistancesTo(HexCell cell) {
+  //  for (int i = 0; i < cells.Length; i++) {
+  //    cells[i].Distance = 0;
+  //  }
+  //}
+
+  //------------------PATH FINDING----------------------
+  public int SearchHeuristic { get; set; }
+
+  public int SearchPriority {
+    get {
+      return distance + SearchHeuristic;
+    }
+  }
+
+  public HexCell NextWithSamePriority { get; set; }
 
 }

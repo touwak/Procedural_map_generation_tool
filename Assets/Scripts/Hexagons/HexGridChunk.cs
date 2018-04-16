@@ -369,7 +369,7 @@ public class HexGridChunk : MonoBehaviour {
 
     for (int i = 2; i < HexMetrics.terraceSteps; i++) {
       Vector3 v1 = v2;
-      Color c1 = c2;
+      //Color c1 = c2;
       v2 = HexMetrics.Perturb(HexMetrics.TerraceLerp(begin, left, i));
       c2 = HexMetrics.TerraceLerp(beginColor, leftColor, i);
       terrain.AddTriangleUnperturbed(v1, v2, boundary);
