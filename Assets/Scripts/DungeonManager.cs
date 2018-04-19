@@ -56,52 +56,66 @@ public class DungeonManager : MonoBehaviour {
 
   public Dictionary<Vector2, TileType> gridPositions =
     new Dictionary<Vector2, TileType>();
-  public int minBound = 0, maxBound;
+  public int minSize = 50, maxSize = 100;
   public static Vector2 startPos;
   public Vector2 endPos;
-  public bool seedDungeon = false;
+  public bool useFixedSeed = false;
+  public int seed = 0;
   public int chamberSize = 3;
+
+  int maxBound;
 
 
   public void StartDungeon(Vector2 playerPos) {
-    //------------------SEED------------------------------
-    if (seedDungeon) {
+
+    /*if (seedDungeon) {
       TextHandle textHandle = GameManager.instance.GetTextHandle();
-      int seed = textHandle.FindDungeon(playerPos);
+      //int seed = textHandle.FindDungeon(playerPos);
 
       //the dungeon doesn't exist
       if (seed == -1) {
         int posX = (int)playerPos.x;
         int posY = (int)playerPos.y;
         string pos = posX + "|" + posY + "|";
-        seed = Random.Range(0, 100 + 1);
+        //seed = Random.Range(0, 100 + 1);
 
         string seedCount = pos + seed.ToString() + "|";
         textHandle.WriteFile("seeds", seedCount);
       }
         Random.InitState(seed);
+    }*/
+
+    //------------------SEED------------------------------
+    Random.State originalRandomState = Random.state;
+    if (!useFixedSeed) {
+      seed = Random.Range(0, int.MaxValue);
+      seed ^= (int)System.DateTime.Now.Ticks;
+      seed ^= (int)Time.unscaledTime;
+      seed &= int.MaxValue;
     }
+    Random.InitState(seed);
 
     gridPositions.Clear();
-    maxBound = Random.Range(50, maxBound);
+    maxBound = Random.Range(minSize, maxSize);
 
-    //BuildAStarPath();
     BuildEssentialPath();
     BuildRandomPath();
+
+    Random.state = originalRandomState;
   }
 
   //-------------------------------ESSENTIAL PATH--------------------------------
   //TODO Add the possibility to switch Start/End points between horizontal and vertical 
   private void BuildEssentialPath() {
     //first node
-    int randomY = Random.Range(0, maxBound + 1);
+    int randomY = Random.Range(0, maxSize + 1);
     PathTile ePath = new PathTile(TileType.essential,
-      new Vector2(0, randomY), minBound, maxBound, gridPositions);
+      new Vector2(0, randomY), minSize, maxSize, gridPositions);
     startPos = ePath.position;
 
     int boundTracker = 0;
     //when boundTracker is equal to maxBound means that we reach the last column of the right
-    while (boundTracker < maxBound) {
+    while (boundTracker < maxSize) {
       gridPositions.Add(ePath.position, TileType.empty);
       int adjacentTileCount = ePath.adjacentPathTiles.Count;
       Vector2 nextEpathPos = new Vector2(0, 0);
@@ -115,10 +129,10 @@ public class DungeonManager : MonoBehaviour {
       }
 
       PathTile nextEPath = new PathTile(TileType.essential, nextEpathPos,
-        minBound, maxBound, gridPositions);
+        minSize, maxSize, gridPositions);
       //to change the start and end logic
       if (nextEPath.position.x > ePath.position.x ||
-        (nextEPath.position.x == maxBound - 1 && Random.Range(0, 2) == 1)) {
+        (nextEPath.position.x == maxSize - 1 && Random.Range(0, 2) == 1)) {
         ++boundTracker;
       }
       ePath = nextEPath;
@@ -131,36 +145,6 @@ public class DungeonManager : MonoBehaviour {
     endPos = new Vector2(ePath.position.x, ePath.position.y);
   }
 
-  //--------------------------ASTAR------------------------------
-  /*private void BuildAStarPath() {
-    ArrayList essentialPath = new ArrayList();
-    AStar aStar = new AStar();
-
-    //start node
-    int randomY = Random.Range(0, maxBound + 1);
-
-    PathTile startTile = new PathTile(TileType.essential,
-      new Vector2(0, randomY), minBound, maxBound, gridPositions);
-    startPos = startTile.position;
-
-    //end node
-    int randomX = Random.Range(0, maxBound + 1);
-    int endRandomY = Random.Range(0, maxBound + 1);
-    
-    PathTile goalTile = new PathTile(TileType.essential,
-      new Vector2(maxBound, endRandomY), minBound, maxBound, gridPositions);
-
-    essentialPath = aStar.BuildAStarPath(startTile.position, goalTile.position, 
-                                          minBound, maxBound);
-
-    Vector3 auxPos = new Vector3();
-    for (int i = 0; i < essentialPath.Count; i++) {
-      auxPos = (Vector3)essentialPath[i];
-      gridPositions.Add(new Vector2(auxPos.x, auxPos.y), TileType.essential);
-    }
-
-    endPos = new Vector2(auxPos.x, auxPos.y);
-  }*/
 
   //-------------------------RANDOM PATH-------------------------
   private void BuildRandomPath() {
@@ -169,7 +153,7 @@ public class DungeonManager : MonoBehaviour {
     foreach(KeyValuePair<Vector2, TileType> tile in gridPositions) {
       Vector2 tilePos = new Vector2(tile.Key.x, tile.Key.y);
       patQueue.Add(new PathTile(TileType.random, tilePos,
-        minBound, maxBound, gridPositions));
+        minSize, maxBound, gridPositions));
     }
 
     patQueue.ForEach(delegate (PathTile tile) {
@@ -189,7 +173,7 @@ public class DungeonManager : MonoBehaviour {
             gridPositions.Add(newRPathPos, TileType.empty);
 
             PathTile newRPath = new PathTile(TileType.random, newRPathPos,
-              minBound, maxBound, gridPositions);
+              minSize, maxBound, gridPositions);
             patQueue.Add(newRPath);
           }
         }
@@ -210,8 +194,7 @@ public class DungeonManager : MonoBehaviour {
           chamberTilePos.x < maxBound && chamberTilePos.x > 0 &&
           chamberTilePos.y < maxBound && chamberTilePos.y > 0) {
           
-          if(Random.Range(0, 70) == 1 /*&& 
-            !CheckNeighboursType(chamberTilePos, TileType.chest, gridPositions)*/) {
+          if(Random.Range(0, 70) == 1) {
 
             gridPositions.Add(chamberTilePos, TileType.chest);
           }
@@ -222,28 +205,5 @@ public class DungeonManager : MonoBehaviour {
       }
     }
   }
-
-  // TODO FIX THIS
-  //private bool CheckNeighboursType(Vector2 pos, TileType type, Dictionary<Vector2, TileType> dungeonTiles) {
-  //  //right
-  //  if (dungeonTiles[new Vector2(pos.x + 1, pos.y)] == type) {
-  //    return true;
-  //  }
-  //  //top
-  //  else if (dungeonTiles[new Vector2(pos.x, pos.y + 1)] == type) {
-  //    return true;
-  //  }
-  //  //left
-  //  else if (dungeonTiles[new Vector2(pos.x - 1, pos.y)] == type) {
-  //    return true;
-  //  }
-  //  //bottom
-  //  else if (dungeonTiles[new Vector2(pos.x, pos.y - 1)] == type) {
-  //    return true;
-  //  }
-
-  //  return false;
-  //}
-
 
 }

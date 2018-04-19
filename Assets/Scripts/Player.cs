@@ -32,8 +32,8 @@ public class Player : MovingObject
     base.Start ();
 	}
 	
-	private void Update ()
-	{
+	private void Update () {
+
     if (!GameManager.instance.playersTurn) return;
 
     int horizontal = 0;
@@ -101,15 +101,22 @@ public class Player : MovingObject
 		}
 	}
 
-  public Vector2 GetPosition() {
-    return position;
+  public Vector2 Position {
+    get {
+      return position;
+    }
+    set {
+      if (value != position) {
+        position = value;
+        transform.position = position;
+      }
+    }
   }
 
   private void GoDungeonPortal() {
     if (onWorldBoard) {
       onWorldBoard = false;
       GameManager.instance.EnterDungeon();
-      //GameManager.instance.EnterBSPDungeon();
       transform.position = DungeonManager.startPos;
     }
     else {

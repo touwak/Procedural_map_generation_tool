@@ -5,14 +5,16 @@ using Random = UnityEngine.Random;
 
 public class BSPDungeonManager : MonoBehaviour {
 
-  public int width, height;
+  public int minSize = 50, maxSize = 100;
   public Dictionary<Vector2, TileType> gridPositions = 
     new Dictionary<Vector2, TileType>();
-  
+
+  [HideInInspector]
+  public int width, height;
 
   private void Awake() {
-    width = Random.Range(50, 101);
-    height = Random.Range(50, 101);
+    width = Random.Range(minSize, maxSize);
+    height = Random.Range(minSize, maxSize);
   }
 
   // Use this for initialization
@@ -26,8 +28,10 @@ public class BSPDungeonManager : MonoBehaviour {
 	}
 
   public void StartDungeon() {
-    width = Random.Range(50, 101);
-    height = Random.Range(50, 101);
+
+    gridPositions.Clear();
+    width = Random.Range(minSize, maxSize);
+    height = Random.Range(minSize, maxSize);
 
     GenerateLevel();
 
@@ -36,7 +40,7 @@ public class BSPDungeonManager : MonoBehaviour {
 
   //error when the list is modify
   private void GenerateLevel() {
-    //Leaf root = new Leaf(0, 0, 20, 20);
+
     Leaf root = new Leaf(0, 0, width, height);
     root.Split();
 

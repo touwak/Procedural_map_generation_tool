@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
 	public int healthPoints = 100;							   
 	public static GameManager instance = null;				
 	[HideInInspector] public bool playersTurn = true;
-  public int mode = 0;
+  [Range(0, 2)] public int mode;
+
   
 
   private BoardManager boardScript;         
@@ -37,7 +38,9 @@ public class GameManager : MonoBehaviour
     dungeonScript = GetComponent<DungeonManager>();
     dungeonBSPScript = GetComponent<BSPDungeonManager>();
     automataScript = GetComponent<MapGenerator>();
-    playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+    if (GameObject.FindGameObjectWithTag("Player")) {
+      playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+    }
     textHandle = new TextHandle();
     textHandle.ReadFile("seeds");
 
@@ -64,11 +67,39 @@ public class GameManager : MonoBehaviour
         break;
     }
 
-    //EnterAutomataCave();
-    //enemies.Clear();
+    if(mode != 0) {
+      playerOne.gameObject.SetActive(false);
+    }
+  }
+
+  public void RefreshGame() {
+    switch (mode) {
+      case 0:
+        boardScript.ResetEndlessMap();
+        boardScript.BoardSetup();
+        break;
+
+      case 1:
+        boardScript.ResetDungeon();
+        EnterDungeon();
+        break;
+
+      case 2:
+        boardScript.ResetDungeon();
+        EnterBSPDungeon();
+        break;
+
+      default:
+        boardScript.BoardSetup();
+        break;
+    }
   }
 	
 	void Update()	{
+
+    if (Input.GetKeyDown(KeyCode.Space)){
+      RefreshGame();
+    }
 
     if (playersTurn || enemiesMoving) {
       return;
@@ -103,21 +134,37 @@ public class GameManager : MonoBehaviour
   }
 
   public Player GetPlayerOne() {
-    return playerOne;
+    if (playerOne != null) {
+      return playerOne;
+    }
+    else {
+      return null;
+    }
   }
 
   public TextHandle GetTextHandle() {
     return textHandle;
   }
 
-  public void EnterDungeon() {
-    dungeonScript.StartDungeon(playerOne.GetPosition());
+  public void EnterDungeon(int minSize = -1, int maxSize = -1) {
+    if(maxSize > minSize && maxSize > 10 || minSize > 0) {
+      dungeonScript.minSize = minSize;
+      dungeonScript.maxSize = maxSize;
+    }
+
+    dungeonScript.StartDungeon(playerOne.Position);
     boardScript.SetDungeonBoard(dungeonScript.gridPositions,
-      dungeonScript.maxBound, dungeonScript.maxBound, dungeonScript.endPos);
+      dungeonScript.maxSize, dungeonScript.maxSize, dungeonScript.endPos);
     playerOne.dungeonTransition = false;
   }
 
-  public void EnterBSPDungeon() {
+  public void EnterBSPDungeon(int minSize = -1, int maxSize = -1) {
+
+    if (maxSize > minSize && maxSize > 10 || minSize > 0) {
+      dungeonBSPScript.minSize = minSize;
+      dungeonBSPScript.maxSize = maxSize;
+    }
+
     dungeonBSPScript.StartDungeon();
     boardScript.SetDungeonBoard(dungeonBSPScript.gridPositions,
       dungeonBSPScript.width, dungeonBSPScript.height, new Vector2(100, 100));

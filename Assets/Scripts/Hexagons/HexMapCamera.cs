@@ -40,7 +40,7 @@ public class HexMapCamera : MonoBehaviour {
     }
   }
 
-  void AdjustPosition(float xDelta, float zDelta) {
+  public void AdjustPosition(float xDelta, float zDelta) {
     Vector3 direction = transform.localRotation * 
       new Vector3(xDelta, 0f, zDelta).normalized;
     float damping = Mathf.Max(Mathf.Abs(xDelta), Mathf.Abs(zDelta));
@@ -49,7 +49,12 @@ public class HexMapCamera : MonoBehaviour {
 
     Vector3 position = transform.localPosition;
     position += direction * distance;
-    transform.localPosition = ClampPosition(position);
+    if (grid != null) {
+      transform.localPosition = ClampPosition(position);
+    }
+    else {
+      transform.localPosition = position;
+    }
   }
 
   void AdjustZoom(float delta) {

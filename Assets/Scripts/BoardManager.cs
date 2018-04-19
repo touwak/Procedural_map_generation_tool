@@ -22,12 +22,15 @@ public class BoardManager : MonoBehaviour
   private Player player;
   public int columns = 5;
   public int rows = 5;
+
+  public bool is2D;
+  //-------------2D---------------------
   public GameObject exit;
   public GameObject[] floorTiles;
   public GameObject[] wallTiles;
   public GameObject[] outerWallTiles;
   public GameObject chestTile;
-  public bool is2D;
+  
 
   //--------------3D----------------------
   public GameObject[] floorTiles3D;
@@ -80,10 +83,10 @@ public class BoardManager : MonoBehaviour
 
   public void AddToBoard(int horizontal, int vertical) {
     if (horizontal == 1) {
-      int x = (int)player.GetPosition().x;
+      int x = (int)player.Position.x;
       int sightX = x + 2;
       for (x += 1; x <= sightX; x++) {
-        int y = (int)player.GetPosition().y;
+        int y = (int)player.Position.y;
         int sightY = y + 1;
         for (y -= 1; y <= sightY; y++) {
           AddTiles(new Vector2(x, y));
@@ -91,10 +94,10 @@ public class BoardManager : MonoBehaviour
       }
     }
     else if (horizontal == -1) {
-      int x = (int)player.GetPosition().x;
+      int x = (int)player.Position.x;
       int sightX = x - 2;
       for (x -= 1; x >= sightX; x--) {
-        int y = (int)player.GetPosition().y;
+        int y = (int)player.Position.y;
         int sightY = y + 1;
         for (y -= 1; y <= sightY; y++) {
           AddTiles(new Vector2(x, y));
@@ -102,10 +105,10 @@ public class BoardManager : MonoBehaviour
       }
     }
     else if (vertical == 1) {
-      int y = (int)player.GetPosition().y;
+      int y = (int)player.Position.y;
       int sightY = y + 2;
       for(y += 1; y <= sightY; y++) {
-        int x = (int)player.GetPosition().x;
+        int x = (int)player.Position.x;
         int sightX = x + 1;
         for(x -= 1; x <= sightX; x++) {
           AddTiles(new Vector2(x, y));
@@ -113,10 +116,10 @@ public class BoardManager : MonoBehaviour
       }
     }
     else if (vertical == -1) {
-      int y = (int)player.GetPosition().y;
+      int y = (int)player.Position.y;
       int sightY = y - 2;
       for (y -= 1; y >= sightY; y--) {
-        int x = (int)player.GetPosition().x;
+        int x = (int)player.Position.x;
         int sightX = x + 1;
         for (x -= 1; x <= sightX; x++) {
           AddTiles(new Vector2(x, y));
@@ -272,6 +275,22 @@ public class BoardManager : MonoBehaviour
   public void SetWorldBoard() {
     Destroy(dungeonBoardHolder.gameObject);
     boardHolder.gameObject.SetActive(true);
+  }
+
+  // reset the map
+  public void ResetEndlessMap() {
+    if (boardHolder != null) {
+      Destroy(boardHolder.gameObject);
+    }
+    gridPositions.Clear();
+    BoardSetup();
+    GameManager.instance.GetPlayerOne().Position = new Vector2(2, 2);
+  }
+
+  public void ResetDungeon() {
+    if (dungeonBoardHolder != null) {
+      Destroy(dungeonBoardHolder.gameObject);
+    }
   }
 
 }
