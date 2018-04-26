@@ -11,7 +11,7 @@ public class MapGenerator : MonoBehaviour {
   public int seed;
   public bool useRandomSeed;
 
-  [Range(0, 100)]
+  [Range(44, 55)]
   public int randomFillPercent;
 
   int[,] map;
@@ -19,12 +19,6 @@ public class MapGenerator : MonoBehaviour {
   private void Start() {
 
     GenerateMap();
-  }
-
-  private void Update() {
-    if (Input.GetMouseButtonDown(0)) {
-      GenerateMap();
-    }
   }
 
   public void GenerateMap() {

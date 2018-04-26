@@ -15,8 +15,8 @@ public class HexMapEditor : MonoBehaviour {
 
   private int activeElevation;
   private int activeWaterLevel;
-  private bool applyElevation = true;
-  private bool applyWaterLevel = true;
+  private bool applyElevation = false;
+  private bool applyWaterLevel = false;
   private int brushSize;
 
   private OptionalToggle riverMode, roadMode, walledMode;

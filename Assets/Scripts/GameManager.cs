@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 	public static GameManager instance = null;				
 	[HideInInspector] public bool playersTurn = true;
   [Range(0, 2)] public int mode;
+  public bool is2D;
 
   
 
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
 	}
 
   void InitGame() {
+    boardScript.is2D = is2D;
 
     switch (mode) {
       case 0:
@@ -73,26 +75,9 @@ public class GameManager : MonoBehaviour
   }
 
   public void RefreshGame() {
-    switch (mode) {
-      case 0:
-        boardScript.ResetEndlessMap();
-        boardScript.BoardSetup();
-        break;
-
-      case 1:
-        boardScript.ResetDungeon();
-        EnterDungeon();
-        break;
-
-      case 2:
-        boardScript.ResetDungeon();
-        EnterBSPDungeon();
-        break;
-
-      default:
-        boardScript.BoardSetup();
-        break;
-    }
+    boardScript.ResetMap();
+    InitGame();
+    
   }
 	
 	void Update()	{

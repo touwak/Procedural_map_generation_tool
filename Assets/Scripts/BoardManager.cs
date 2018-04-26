@@ -23,6 +23,7 @@ public class BoardManager : MonoBehaviour
   public int columns = 5;
   public int rows = 5;
 
+  [HideInInspector]
   public bool is2D;
   //-------------2D---------------------
   public GameObject exit;
@@ -287,10 +288,19 @@ public class BoardManager : MonoBehaviour
     GameManager.instance.GetPlayerOne().Position = new Vector2(2, 2);
   }
 
-  public void ResetDungeon() {
-    if (dungeonBoardHolder != null) {
+  public void ResetMap() {
+
+    // endless
+    if (boardHolder != null) {
+      Destroy(boardHolder.gameObject);
+      gridPositions.Clear();
+      GameManager.instance.GetPlayerOne().Position = new Vector2(2, 2);
+    }
+    //dungeons
+    else if (dungeonBoardHolder != null) {
       Destroy(dungeonBoardHolder.gameObject);
     }
+    
   }
 
 }
