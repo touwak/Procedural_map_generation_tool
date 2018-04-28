@@ -66,6 +66,10 @@ public class DungeonManager : MonoBehaviour {
   int maxBound;
 
 
+  /// <summary>
+  /// Generate a new pathfinding map
+  /// </summary>
+  /// <param name="playerPos"> Position of the player </param>
   public void StartDungeon(Vector2 playerPos) {
 
     /*if (seedDungeon) {
@@ -105,7 +109,10 @@ public class DungeonManager : MonoBehaviour {
   }
 
   //-------------------------------ESSENTIAL PATH--------------------------------
-  //TODO Add the possibility to switch Start/End points between horizontal and vertical 
+
+    /// <summary>
+    /// Generate the main path of the dungeon
+    /// </summary>
   private void BuildEssentialPath() {
     //first node
     int randomY = Random.Range(0, maxSize + 1);
@@ -147,6 +154,9 @@ public class DungeonManager : MonoBehaviour {
 
 
   //-------------------------RANDOM PATH-------------------------
+  /// <summary>
+  /// Given the main path generate random paths around it
+  /// </summary>
   private void BuildRandomPath() {
     List<PathTile> patQueue = new List<PathTile>();
 
@@ -182,9 +192,14 @@ public class DungeonManager : MonoBehaviour {
   }
 
   //-----------------------RANDOM CHAMBER--------------------------------
+  /// <summary>
+  /// Generate chambers at the end of the random path
+  /// </summary>
+  /// <param name="tile"> reference tile </param>
   private void BuildRandomChamber(PathTile tile) {
-    int size = chamberSize, adjacentTileCount = tile.adjacentPathTiles.Count,
-      randomIndex = Random.Range(0, adjacentTileCount);
+    int size = chamberSize;
+    int adjacentTileCount = tile.adjacentPathTiles.Count;
+    int randomIndex = Random.Range(0, adjacentTileCount);
     Vector2 chamberOrigin = tile.adjacentPathTiles[randomIndex];
 
     for(int x = (int)chamberOrigin.x; x < chamberOrigin.x + size; x++) {

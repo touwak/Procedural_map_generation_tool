@@ -15,6 +15,9 @@ public class Chest : MonoBehaviour {
     spriteRenderer = GetComponent<SpriteRenderer>();
   }
 
+  /// <summary>
+  /// Randomlu instantiate a item 
+  /// </summary>
   public void Open() {
     spriteRenderer.sprite = openSprite;
 

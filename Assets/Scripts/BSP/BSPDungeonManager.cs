@@ -27,6 +27,9 @@ public class BSPDungeonManager : MonoBehaviour {
 		
 	}
 
+  /// <summary>
+  /// Initialize the dungeon
+  /// </summary>
   public void StartDungeon() {
 
     gridPositions.Clear();
@@ -38,7 +41,9 @@ public class BSPDungeonManager : MonoBehaviour {
     Debug.LogFormat("width: {0}, height: {1}", width, height);
   }
 
-  //error when the list is modify
+  /// <summary>
+  /// Generate the dungeon
+  /// </summary>
   private void GenerateLevel() {
 
     Leaf root = new Leaf(0, 0, width, height);

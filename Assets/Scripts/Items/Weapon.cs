@@ -17,6 +17,9 @@ public class Weapon : MonoBehaviour {
 
   //}
 
+  /// <summary>
+  /// Generate the stats and rarity of the weapon
+  /// </summary>
   private void Start() {
     int randomLevel = Random.Range(0, 100);
 

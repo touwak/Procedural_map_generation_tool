@@ -66,15 +66,27 @@ public class Player : MovingObject
       }
     }
   }
-	
-	protected override bool AttemptMove <T> (int xDir, int yDir) {	
+
+  /// <summary>
+  /// Detect if the object can move or not
+  /// </summary>
+  /// <typeparam name="T"> Type of object </typeparam>
+  /// <param name="xDir"> position in the X axis to check </param>
+  /// <param name="yDir"> position in the Y axis to check </param>
+  /// <returns></returns>
+  protected override bool AttemptMove <T> (int xDir, int yDir) {	
 		bool hit = base.AttemptMove <T> (xDir, yDir);
 		GameManager.instance.playersTurn = false;
 
 		return hit;
 	}
-	
-	protected override void OnCantMove <T> (T component) {
+
+  /// <summary>
+  /// Define the behaviour of the player when collide with an object
+  /// </summary>
+  /// <typeparam name="T"> object collided type </typeparam>
+  /// <param name="component"> object collided </param>
+  protected override void OnCantMove <T> (T component) {
     if (typeof(T) == typeof(Wall)){
       Wall hitWall = component as Wall;
       hitWall.DamageWall(wallDamage);
@@ -87,20 +99,17 @@ public class Player : MovingObject
 		animator.SetTrigger ("playerChop");
 	}
 	
+  /// <summary>
+  /// update player's health 
+  /// </summary>
+  /// <param name="loss"> amount of health lost </param>
 	public void LoseHealth (int loss) {
 		animator.SetTrigger ("playerHit");
 		health -= loss;
-		//healthText.text = "-"+ loss + " Health: " + health;
+		//healthText.text = "-"+ loss + " Health: " + health;	
 		
-		CheckIfGameOver ();
 	}
 	
-	private void CheckIfGameOver ()	{
-		if (health <= 0) {	
-			GameManager.instance.GameOver ();
-		}
-	}
-
   public Vector2 Position {
     get {
       return position;
@@ -113,6 +122,9 @@ public class Player : MovingObject
     }
   }
 
+  /// <summary>
+  /// Switch between dungeon and endless world
+  /// </summary>
   private void GoDungeonPortal() {
     if (onWorldBoard) {
       onWorldBoard = false;
@@ -138,6 +150,10 @@ public class Player : MovingObject
     }
   }
 
+  /// <summary>
+  /// Update the inventory
+  /// </summary>
+  /// <param name="item"> Item added to the inventory</param>
   private void UpdateInvetory(Collider2D item) {
     Item itemData = item.GetComponent<Item>();
 

@@ -20,11 +20,17 @@ public class Item : MonoBehaviour {
 
   private SpriteRenderer spriteRenderer;
 
+  /// <summary>
+  /// Initialize the item
+  /// </summary>
   public void RandomItemInit() {
     spriteRenderer = GetComponent<SpriteRenderer>();
     SelectItem();
   }
 
+  /// <summary>
+  /// generate randomly a equip object (boot or glove) and its states and rarity
+  /// </summary>
   private void SelectItem() {
     var itemCount = Enum.GetValues(typeof(ItemType)).Length;
     type = (ItemType)Random.Range(0, itemCount);

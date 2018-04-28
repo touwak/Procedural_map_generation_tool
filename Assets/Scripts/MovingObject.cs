@@ -20,9 +20,15 @@ public abstract class MovingObject : MonoBehaviour
 		//By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
 		inverseMoveTime = 1f / moveTime;
 	}
-	
-	
-	protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
+
+  /// <summary>
+  /// Move this object
+  /// </summary>
+  /// <param name="xDir"> direction to move in X axis</param>
+  /// <param name="yDir"> direction to move in Y axis </param>
+  /// <param name="hit"> raycast2D to detect collisions </param>
+  /// <returns></returns>
+  protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
 	{
 		Vector2 start = transform.position;
 		Vector2 end = start + new Vector2 (xDir, yDir);
@@ -43,7 +49,11 @@ public abstract class MovingObject : MonoBehaviour
 		return false;
 	}
 	
-	
+	/// <summary>
+  /// Move the object smoothly
+  /// </summary>
+  /// <param name="end"> destiny to move </param>
+  /// <returns></returns>
 	protected IEnumerator SmoothMovement (Vector3 end)
 	{
 		//Calculate the remaining distance to move based on the square magnitude of the difference between current position and end parameter. 
@@ -61,8 +71,15 @@ public abstract class MovingObject : MonoBehaviour
 			yield return null;
 		}
 	}
-	
-	protected virtual bool AttemptMove <T> (int xDir, int yDir)
+
+  /// <summary>
+  /// Detect if the object can move or not
+  /// </summary>
+  /// <typeparam name="T"> Type of object </typeparam>
+  /// <param name="xDir"> position in the X axis to check </param>
+  /// <param name="yDir"> position in the Y axis to check </param>
+  /// <returns></returns>
+  protected virtual bool AttemptMove <T> (int xDir, int yDir)
 		where T : Component
 	{
 		//Hit will store whatever our linecast hits when Move is called.

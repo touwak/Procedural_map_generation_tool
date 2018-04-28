@@ -15,6 +15,11 @@ public class TileCamera2D : MonoBehaviour {
     }
   }
 
+  /// <summary>
+  /// Adjust the camera's position
+  /// </summary>
+  /// <param name="xDelta"> the value in the virtual axis X </param>
+  /// <param name="yDelta"> the value in the virtual axis Y </param>
   public void AdjustPosition(float xDelta, float yDelta) {
     Vector3 direction = transform.localRotation *
       new Vector3(xDelta, yDelta, 0f).normalized;

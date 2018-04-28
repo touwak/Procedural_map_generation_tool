@@ -21,6 +21,9 @@ public class MapGenerator : MonoBehaviour {
     GenerateMap();
   }
 
+  /// <summary>
+  /// Generate the map
+  /// </summary>
   public void GenerateMap() {
     map = new int[width, height];
     RandomFillMap();
@@ -52,6 +55,9 @@ public class MapGenerator : MonoBehaviour {
     meshGen.GenerateMesh(borderedMap, 1);
   }
 
+  /// <summary>
+  /// Fill randomly the grid with 1 (wall) or 0 (empty or playable)
+  /// </summary>
   void RandomFillMap() {
     if (useRandomSeed) {
       Random.InitState((int)Time.time);
@@ -72,6 +78,10 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
+  /// <summary>
+  /// Go over the grid checking the neighbours of each tile, 
+  /// if this neightbours 4 or more are walls switch this tile into wall or vice versa
+  /// </summary>
   void SmoothMap() {
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
@@ -87,6 +97,12 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
+  /// <summary>
+  /// Given a position in the grid returns the the number of sorrounding walls.
+  /// </summary>
+  /// <param name="gridX"> X position on the grid </param>
+  /// <param name="gridY"> Y position on the grid </param>
+  /// <returns> number of surrounding walls</returns>
   int GetSorroundingWallCount(int gridX, int gridY) {
     int wallCount = 0;
     for( int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++) {
@@ -116,6 +132,12 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
+  /// <summary>
+  /// Returns the tiles that compose a region
+  /// </summary>
+  /// <param name="startX"> X position inside the region </param>
+  /// <param name="startY"> Y position inside the region </param>
+  /// <returns></returns>
   List<Coord> GetRegionTiles(int startX, int startY) {
     List<Coord> tiles = new List<Coord>();
     int[,] mapFlags = new int[width, height];
@@ -144,11 +166,21 @@ public class MapGenerator : MonoBehaviour {
     return tiles;
   }
 
+  /// <summary>
+  /// Given a position check if is inside the map
+  /// </summary>
+  /// <param name="x"> X axis </param>
+  /// <param name="y"> Y axis </param>
+  /// <returns></returns>
   bool IsInMapeRange(int x, int y) {
     return x >= 0 && x < width && y >= 0 && y < height;
   }
 
-  //return the regions of "rock" 
+  /// <summary>
+  /// Given a tile type create a list with all the regions of this type
+  /// </summary>
+  /// <param name="tileType"> type of tile </param>
+  /// <returns> a list with all the regions of a specific type</returns>
   List<List<Coord>> GetRegions(int tileType) {
     List<List<Coord>> regions = new List<List<Coord>>();
     int[,] mapFlags = new int[width, height];
@@ -169,7 +201,10 @@ public class MapGenerator : MonoBehaviour {
     return regions;
   }
 
-  
+  /// <summary>
+  /// Process the early generated map and erase the small rock regions,
+  /// erase the small cave regions and connect all the rooms.
+  /// </summary>
   void ProcessMap() {
 
     //erase the small regions of "rock"

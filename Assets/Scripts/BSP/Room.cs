@@ -16,6 +16,13 @@ public class Room {
   public Dictionary<Vector2, TileType> roomPositions =
     new Dictionary<Vector2, TileType>();
 
+  /// <summary>
+  /// Initialize the room
+  /// </summary>
+  /// <param name="posX"> position in X axis </param>
+  /// <param name="posY"> position in Y axis </param>
+  /// <param name="widthSize"> width size of the room </param>
+  /// <param name="heigthSize"> height size of the room </param>
   public Room(int posX, int posY, int widthSize, int heigthSize) {
 
     xPos = posX;
@@ -32,9 +39,12 @@ public class Room {
     roomPositions = CreateRoom();
   }
 
+  /// <summary>
+  /// Create the room
+  /// </summary>
+  /// <returns> a dictionary with the tiles position and their type </returns>
   private Dictionary<Vector2, TileType> CreateRoom() {
-    Dictionary<Vector2, TileType> roomPos = 
-    new Dictionary<Vector2, TileType>();
+    Dictionary<Vector2, TileType> roomPos =  new Dictionary<Vector2, TileType>();
 
     Vector2 pos = new Vector2(xPos, yPos);
 

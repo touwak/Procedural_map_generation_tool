@@ -11,6 +11,13 @@ public class Leaf {
   public Leaf leftChild, rightChild;
   public Room room;
 
+  /// <summary>
+  /// Initialize the leaf
+  /// </summary>
+  /// <param name="startX">the X position of the start point of the leaf </param>
+  /// <param name="startY">the Y position of the start point of the leaf </param>
+  /// <param name="widthSize"> the X position of the end point of the leaf </param>
+  /// <param name="heightSize">the Y position of the end point of the leaf </param>
   public Leaf(int startX, int startY, int widthSize, int heightSize) {
     x = startX;
     width = widthSize;
@@ -18,6 +25,10 @@ public class Leaf {
     height = heightSize;
   }
 
+  /// <summary>
+  /// split the leaf in two children
+  /// </summary>
+  /// <returns> returns if the leaf had been splited </returns>
   public bool Split() {
 
     //check if the leaf is already splited
@@ -59,6 +70,10 @@ public class Leaf {
     } 
   }	
 
+  /// <summary>
+  /// Go trhough all the tree and generate rooms in every leaf
+  /// </summary>
+  /// <param name="grid"> final grid with all the tiles of dungeon </param>
   public void CreateRooms(Dictionary<Vector2, TileType> grid) {
     if(leftChild != null || rightChild != null) {
 
@@ -87,6 +102,10 @@ public class Leaf {
     }
   }
 
+  /// <summary>
+  /// returns the room of the leaf, if not have one returns one of its children
+  /// </summary>
+  /// <returns> a room </returns>
   public Room GetRoom() {
     if(room != null) {
       return room;
@@ -120,10 +139,16 @@ public class Leaf {
     }
   }
 
+  /// <summary>
+  /// Connect two rooms with a corridor. Take two points randomly in each room 
+  /// and generate a corridor to connect them.
+  /// </summary>
+  /// <param name="left"> room at left </param>
+  /// <param name="right"> room at right </param>
+  /// <param name="grid"> final grid with all the tiles to instantiate </param>
   public void CreateCorridor(Room left, Room right, Dictionary<Vector2, TileType> grid) {
 
-    Dictionary<Vector2, TileType> corridors =
-    new Dictionary<Vector2, TileType>();
+    Dictionary<Vector2, TileType> corridors = new Dictionary<Vector2, TileType>();
 
     Vector2 point1 = new Vector2(Random.Range(left.left + 1, left.right - 1),
       Random.Range(left.top + 1, left.bottom - 1));
@@ -151,7 +176,7 @@ public class Leaf {
           DicToDic(CreateTiles((int)point2.x, (int)point1.y, (int)Mathf.Abs(w), 1), corridors);
           DicToDic(CreateTiles((int)point2.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
-        else {//fixed error
+        else {
           DicToDic(CreateTiles((int)point2.x, (int)point2.y, (int)Mathf.Abs(w) + 1, 1), corridors);
           DicToDic(CreateTiles((int)point1.x, (int)point1.y, 1, (int)Mathf.Abs(h)), corridors);
         }
@@ -166,7 +191,7 @@ public class Leaf {
           DicToDic(CreateTiles((int)point1.x, (int)point2.y, (int)Mathf.Abs(w), 1), corridors);
           DicToDic(CreateTiles((int)point1.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
-        else {//fixed error
+        else {
           DicToDic(CreateTiles((int)point1.x, (int)point1.y, (int)Mathf.Abs(w) + 1, 1), corridors);
           DicToDic(CreateTiles((int)point2.x, (int)point2.y, 1, (int)Mathf.Abs(h)), corridors);
         }
@@ -197,6 +222,14 @@ public class Leaf {
     DicToDic(corridors, grid);
   }
 
+  /// <summary>
+  /// Generate a tiles dictionary with the given shape
+  /// </summary>
+  /// <param name="posX"> first tile X position </param>
+  /// <param name="posY"> first tile Y position </param>
+  /// <param name="widthSize"> width of the shape </param>
+  /// <param name="heigthSize"> height of the shape </param>
+  /// <returns></returns>
   public Dictionary<Vector2, TileType> CreateTiles(int posX, int posY, int widthSize, int heigthSize) {
     Dictionary<Vector2, TileType> tilePos =
     new Dictionary<Vector2, TileType>();
@@ -216,10 +249,15 @@ public class Leaf {
     return tilePos;
   }
 
-  void DicToDic(Dictionary<Vector2, TileType> origin, Dictionary<Vector2, TileType> destine) {
+  /// <summary>
+  /// Copy the content of the origin dictionary into the destiny
+  /// </summary>
+  /// <param name="origin"> dictionary to copy </param>
+  /// <param name="destiny"> destiny of the copy </param>
+  void DicToDic(Dictionary<Vector2, TileType> origin, Dictionary<Vector2, TileType> destiny) {
     foreach (KeyValuePair<Vector2, TileType> pos in origin) {
-      if (!destine.ContainsKey(pos.Key)) {
-        destine.Add(pos.Key, pos.Value);
+      if (!destiny.ContainsKey(pos.Key)) {
+        destiny.Add(pos.Key, pos.Value);
       }
       //else {
       //  Vector2 n = pos.Key;

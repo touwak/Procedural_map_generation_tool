@@ -12,6 +12,10 @@ public class Wall : MonoBehaviour {
     spriteRenderer = GetComponent<SpriteRenderer>();
   }
 
+  /// <summary>
+  /// Manage the damage that the wall can afford until destroy it
+  /// </summary>
+  /// <param name="loss"> Amount of damage </param>
   public void DamageWall(int loss) {
 
     spriteRenderer.sprite = dmgSprite;

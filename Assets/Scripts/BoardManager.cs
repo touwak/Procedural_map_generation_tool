@@ -58,7 +58,9 @@ public class BoardManager : MonoBehaviour
     player = GameManager.instance.GetPlayerOne();
   }
 
-  //create the initial 6 tiles
+  /// <summary>
+  /// Generate the initial grid
+  /// </summary>
   public void BoardSetup() {
     boardHolder = new GameObject("Board").transform;
     floorLevel = (floorTiles3D[0].transform.localScale.y / 2) + 0.5f;
@@ -82,6 +84,11 @@ public class BoardManager : MonoBehaviour
     }
   }
 
+  /// <summary>
+  /// Add the new tiles into board
+  /// </summary>
+  /// <param name="horizontal"> Horizontal direction of the new tiles </param>
+  /// <param name="vertical">Vertical direction of the new tiles </param>
   public void AddToBoard(int horizontal, int vertical) {
     if (horizontal == 1) {
       int x = (int)player.Position.x;
@@ -129,6 +136,10 @@ public class BoardManager : MonoBehaviour
     }
   }
   
+  /// <summary>
+  /// Instantiate the tiles in the map
+  /// </summary>
+  /// <param name="tileToAdd"> tile position </param>
   private void AddTiles(Vector2 tileToAdd) {
     if (!gridPositions.ContainsKey(tileToAdd)) {
       gridPositions.Add(tileToAdd, tileToAdd);
@@ -175,6 +186,13 @@ public class BoardManager : MonoBehaviour
     }
   }
 
+  /// <summary>
+  /// Instantiate the tiles of the pathfinding and BSP dungeons
+  /// </summary>
+  /// <param name="dungeonTiles"> Dictionary with the positions and types of the dungeon tiles </param>
+  /// <param name="width"> width of the grid </param>
+  /// <param name="height"> height of the grid </param>
+  /// <param name="endpos"> position of the last tile </param>
   public void SetDungeonBoard(Dictionary<Vector2, TileType> dungeonTiles,
     int width, int height, Vector2 endpos) {
 
@@ -248,6 +266,13 @@ public class BoardManager : MonoBehaviour
     }
   }
 
+  /// <summary>
+  /// Return if there is a tile around a position, also, change the chest rotation
+  /// </summary>
+  /// <param name="pos"> position to be checked </param>
+  /// <param name="dungeonTiles"> grid with the tile positions </param>
+  /// <param name="isFill">bool to change if the tile is empty or ocupate</param>
+  /// <returns></returns>
   private bool CheckNeighbours(Vector2 pos, Dictionary<Vector2, TileType> dungeonTiles, bool isFill = true) {
     //right
     if(dungeonTiles.ContainsKey(new Vector2(pos.x + 1, pos.y)) == isFill){
@@ -273,21 +298,17 @@ public class BoardManager : MonoBehaviour
     return false;
   }
 
+  /// <summary>
+  /// Switch into endless map
+  /// </summary>
   public void SetWorldBoard() {
     Destroy(dungeonBoardHolder.gameObject);
     boardHolder.gameObject.SetActive(true);
   }
 
-  // reset the map
-  public void ResetEndlessMap() {
-    if (boardHolder != null) {
-      Destroy(boardHolder.gameObject);
-    }
-    gridPositions.Clear();
-    BoardSetup();
-    GameManager.instance.GetPlayerOne().Position = new Vector2(2, 2);
-  }
-
+  /// <summary>
+  /// Destroy the maps of the endless and dungeons maps
+  /// </summary>
   public void ResetMap() {
 
     // endless

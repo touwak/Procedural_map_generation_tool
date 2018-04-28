@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
   private Player playerOne;
   private TextHandle textHandle;
   private BSPDungeonManager dungeonBSPScript;
-  private MapGenerator automataScript;
   private HexMapCamera camera3D;
   
 
@@ -40,7 +39,6 @@ public class GameManager : MonoBehaviour
     boardScript = GetComponent<BoardManager>();
     dungeonScript = GetComponent<DungeonManager>();
     dungeonBSPScript = GetComponent<BSPDungeonManager>();
-    automataScript = GetComponent<MapGenerator>();
     if (GameObject.FindGameObjectWithTag("Player")) {
       playerOne = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
@@ -53,6 +51,9 @@ public class GameManager : MonoBehaviour
     InitGame();
 	}
 
+  /// <summary>
+  /// Initialice the grid with the map type selected
+  /// </summary>
   void InitGame() {
     boardScript.is2D = is2D;
 
@@ -85,6 +86,9 @@ public class GameManager : MonoBehaviour
     }
   }
 
+  /// <summary>
+  /// reset the map
+  /// </summary>
   public void RefreshGame() {
     boardScript.ResetMap();
     InitGame();
@@ -109,6 +113,9 @@ public class GameManager : MonoBehaviour
 		enabled = false;
 	}
 
+  /// <summary>
+  /// Adjust the current camera
+  /// </summary>
   void AdjustCamera() {
     //switch camera between 2D and 3D
     if (is2D) {
@@ -152,6 +159,11 @@ public class GameManager : MonoBehaviour
 		enemiesMoving = false;
 	}
 
+  /// <summary>
+  /// Update the endless map
+  /// </summary>
+  /// <param name="horizontal"> horizontal position of the player </param>
+  /// <param name="vertical"> vertical position of the player </param>
   public void UpdateBoard(int horizontal, int vertical) {
     boardScript.AddToBoard(horizontal, vertical);
   }
@@ -169,6 +181,11 @@ public class GameManager : MonoBehaviour
     return textHandle;
   }
 
+  /// <summary>
+  /// Generate a new pathfinding dungeon when the player go trhough a exit tile
+  /// </summary>
+  /// <param name="minSize"> minimum size of the dungeon </param>
+  /// <param name="maxSize"> maximum size of the dungeon </param>
   public void EnterDungeon(int minSize = -1, int maxSize = -1) {
     if(maxSize > minSize && maxSize > 10 || minSize > 0) {
       dungeonScript.minSize = minSize;
@@ -181,6 +198,11 @@ public class GameManager : MonoBehaviour
     playerOne.dungeonTransition = false;
   }
 
+  /// <summary>
+  /// Generate a new BSP dungeon when the player go trhough a exit tile
+  /// </summary>
+  /// <param name="minSize"> minimum size of the dungeon </param>
+  /// <param name="maxSize"> maximum size of the dungeon </param>
   public void EnterBSPDungeon(int minSize = -1, int maxSize = -1) {
 
     if (maxSize > minSize && maxSize > 10 || minSize > 0) {
@@ -194,18 +216,21 @@ public class GameManager : MonoBehaviour
     playerOne.dungeonTransition = false;
   }
 
-  public void EnterAutomataCave() {
-    automataScript.GenerateMap();
-  }
-
+  /// <summary>
+  /// Translate the player into the enless map
+  /// </summary>
   public void ExitDungeon() {
     boardScript.SetWorldBoard();
     playerOne.dungeonTransition = false;
   }
 
+  /// <summary>
+  /// Instance a tile in the map
+  /// </summary>
+  /// <param name="position"> Position of the tile </param>
+  /// <param name="tile"> tile to be instantiate </param>
+  /// <param name="parent"> the parent of the tile </param>
   public void InstanceTile(Vector3 position, GameObject tile, Transform parent) {
-
-
     GameObject toInstantiate = tile;
     GameObject instance = Instantiate(toInstantiate, 
       position, Quaternion.identity) as GameObject;
@@ -213,6 +238,13 @@ public class GameManager : MonoBehaviour
     instance.transform.SetParent(parent);
   }
 
+  /// <summary>
+  /// Instance a tile in the map
+  /// </summary>
+  /// <param name="position"> Position of the tile </param>
+  /// <param name="tile"> tile to be instantiate </param>
+  /// <param name="parent"> the parent of the tile </param>
+  /// <param name="rotation"> rotation of the tile </param>
   public void InstanceTile(Vector3 position, GameObject tile, 
     Transform parent, Quaternion rotation) {
 
@@ -224,6 +256,10 @@ public class GameManager : MonoBehaviour
     instance.transform.SetParent(parent);
   }
 
+  /// <summary>
+  /// Returns the position of the first tile of the grid
+  /// </summary>
+  /// <returns> a Vector2 with the position</returns>
   Vector2 FirstTilePosition() {
     Vector2 firstTilePos = new Vector2();
       foreach (Vector2 key in dungeonScript.gridPositions.Keys) {
