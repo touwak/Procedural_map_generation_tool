@@ -57,6 +57,16 @@ public class HexMapCamera : MonoBehaviour {
     }
   }
 
+  public void AdjustPosition(Vector2 position) {
+
+    Vector3 pos = new Vector3();
+    pos.x = position.x;
+    pos.z = position.y;
+
+    transform.localPosition = pos;
+
+  }
+
   void AdjustZoom(float delta) {
     zoom = Mathf.Clamp01(zoom + delta);
 

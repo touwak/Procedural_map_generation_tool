@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
 	[HideInInspector] public bool playersTurn = true;
   [Range(0, 2)] public int mode;
   public bool is2D;
+  public Camera camera2D;
 
-  
 
   private BoardManager boardScript;         
 	private List<Enemy> enemies;							
@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
   private TextHandle textHandle;
   private BSPDungeonManager dungeonBSPScript;
   private MapGenerator automataScript;
+  private HexMapCamera camera3D;
+  
 
   void Awake() {
     if (instance == null) {
@@ -45,6 +47,9 @@ public class GameManager : MonoBehaviour
     textHandle = new TextHandle();
     textHandle.ReadFile("seeds");
 
+    camera3D = FindObjectOfType<HexMapCamera>();
+    
+
     InitGame();
 	}
 
@@ -53,11 +58,11 @@ public class GameManager : MonoBehaviour
 
     switch (mode) {
       case 0:
-        boardScript.BoardSetup();
+        boardScript.BoardSetup();        
         break;
 
       case 1:
-        EnterDungeon();
+        EnterDungeon(); 
         break;
 
       case 2:
@@ -69,7 +74,13 @@ public class GameManager : MonoBehaviour
         break;
     }
 
-    if(mode != 0) {
+    AdjustCamera();
+
+    //active or deactive the player
+    if(mode == 0) {
+      playerOne.gameObject.SetActive(true);
+    }
+    else {
       playerOne.gameObject.SetActive(false);
     }
   }
@@ -97,6 +108,33 @@ public class GameManager : MonoBehaviour
 		//Disable this GameManager.
 		enabled = false;
 	}
+
+  void AdjustCamera() {
+    //switch camera between 2D and 3D
+    if (is2D) {
+      camera3D.gameObject.SetActive(false);
+      camera2D.gameObject.SetActive(true);
+
+      Vector3 newPos = new Vector3(0, 0, -1);
+      if (mode != 0) {
+        newPos = new Vector3(FirstTilePosition().x, FirstTilePosition().y, -1); 
+      }
+      
+      camera2D.transform.localPosition = newPos;
+    }
+    //adjust the camera in 3D
+    else {
+      camera2D.gameObject.SetActive(false);
+      camera3D.gameObject.SetActive(true);
+      
+      if (mode == 0) {
+        camera3D.AdjustPosition(new Vector2(0, 0));
+      }
+      else {
+        camera3D.AdjustPosition(FirstTilePosition());
+      }
+    }
+  }
 	
 
 	IEnumerator MoveEnemies()	{
@@ -165,7 +203,6 @@ public class GameManager : MonoBehaviour
     playerOne.dungeonTransition = false;
   }
 
-  //TODO MOVE IT TO A BETTER PLACE
   public void InstanceTile(Vector3 position, GameObject tile, Transform parent) {
 
 
@@ -185,6 +222,15 @@ public class GameManager : MonoBehaviour
       position, rotation) as GameObject;
 
     instance.transform.SetParent(parent);
+  }
+
+  Vector2 FirstTilePosition() {
+    Vector2 firstTilePos = new Vector2();
+      foreach (Vector2 key in dungeonScript.gridPositions.Keys) {
+        firstTilePos = key;
+        break;
+      }
+    return firstTilePos;
   }
 
 }
