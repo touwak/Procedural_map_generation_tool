@@ -9,10 +9,16 @@ public class MapGenerator : MonoBehaviour {
   public int height;
 
   public int seed;
-  public bool useRandomSeed;
+  public bool useSeed;
 
   [Range(44, 55)]
   public int randomFillPercent;
+
+  [Range(1, 5)]
+  public int corridorRadius = 1;
+
+  [Range(5, 10)]
+  public int smoothness = 5;
 
   int[,] map;
 
@@ -28,7 +34,7 @@ public class MapGenerator : MonoBehaviour {
     map = new int[width, height];
     RandomFillMap();
 
-    for (int i = 0; i < 5; i++) { //change the value
+    for (int i = 0; i < smoothness; i++) { 
       SmoothMap();
     }
 
@@ -59,9 +65,14 @@ public class MapGenerator : MonoBehaviour {
   /// Fill randomly the grid with 1 (wall) or 0 (empty or playable)
   /// </summary>
   void RandomFillMap() {
-    if (useRandomSeed) {
-      Random.InitState((int)Time.time);
+    // seed
+    if (!useSeed) { 
+      seed = Random.Range(0, int.MaxValue);
+      seed ^= (int)System.DateTime.Now.Ticks;
+      seed ^= (int)Time.unscaledTime;
+      seed &= int.MaxValue;
     }
+    Random.InitState(seed);
 
     int rnd;
     // 1 wall / 0 empty
@@ -276,8 +287,9 @@ public class MapGenerator : MonoBehaviour {
         }
       }
     }
-
-    // set accesible from main room true and every connected room to this
+    /// <summary>
+    /// set accesible from main room true and every connected room to this
+    /// </summary>
     public void SetAccesibleFromMainRoom() {
       if (!isAccesibleFromMainRoom) {
         isAccesibleFromMainRoom = true;
@@ -287,8 +299,11 @@ public class MapGenerator : MonoBehaviour {
         }
       }
     }
-
-    // connect rooms and set access to the main room
+    /// <summary>
+    /// connect rooms with and set access to the main room
+    /// </summary>
+    /// <param name="roomA"> roomA to connect </param>
+    /// <param name="roomB"> roomB to connect </param>
     public static void ConnectRooms(Room roomA, Room roomB) {
 
       if (roomA.isAccesibleFromMainRoom) {
@@ -302,7 +317,11 @@ public class MapGenerator : MonoBehaviour {
       roomB.connectedRooms.Add(roomA);
     }
 
-    // return if is conected with other room
+    /// <summary>
+    /// Given a room return if is conected with this room
+    /// </summary>
+    /// <param name="otherRoom"> Room to be checked </param>
+    /// <returns> true if the rooms are connected or false if are not</returns>
     public bool IsConnected(Room otherRoom) {
       return connectedRooms.Contains(otherRoom);
     }
@@ -313,7 +332,11 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
-
+  /// <summary>
+  /// Connect rooms to their nearest rooms
+  /// </summary>
+  /// <param name="allRooms"> A list with all the rooms in the map </param>
+  /// <param name="forceAccessibilityFromMainRoom"> bool for use recursivity recursivity </param>
   void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
 
     List<Room> roomListA = new List<Room>(); 
@@ -391,17 +414,28 @@ public class MapGenerator : MonoBehaviour {
 
   }
 
+  /// <summary>
+  /// Create passages between rooms
+  /// </summary>
+  /// <param name="roomA"> Origin room to be connected </param>
+  /// <param name="roomB"> Destiny room to be connected </param>
+  /// <param name="tileA"> Tile from origin room </param>
+  /// <param name="tileB"> Tile from destiny room </param>
   void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB) {
     Room.ConnectRooms(roomA, roomB);
 
     List<Coord> line = GetLine(tileA, tileB);
     foreach(Coord c in line) {
-      DrawCircle(c, 1);
+      DrawCircle(c, corridorRadius);
     }
   }
 
-  // Create the path to conect the rooms / radius is the size of the path
-  void DrawCircle(Coord c, int r) { //TODO editable
+  /// <summary>
+  /// Create the path to conect the rooms
+  /// </summary>
+  /// <param name="c"> coordinates of the path </param>
+  /// <param name="r"> Size of the path </param>
+  void DrawCircle(Coord c, int r) { 
     for (int x = -r; x <= r; x++) {
       for (int y = -r; y <= r; y++) {
         if(x * x + y * y <= r * r) { // check if is inside the circle
@@ -416,7 +450,12 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
-  // Create the line that joins the caves
+  /// <summary>
+  /// Create the line that joins the caves
+  /// </summary>
+  /// <param name="from"> Line start point </param>
+  /// <param name="to"> Line end point </param>
+  /// <returns></returns>
   List<Coord> GetLine(Coord from, Coord to) {
 
     List<Coord> line = new List<Coord>();
@@ -469,6 +508,11 @@ public class MapGenerator : MonoBehaviour {
     return line;
   }
 
+  /// <summary>
+  /// Transform from coord system to world position
+  /// </summary>
+  /// <param name="tile"> Coordinates to be converted </param>
+  /// <returns>a point in world coordinates </returns>
   Vector3 CoordToWorldPoint(Coord tile) {
     return new Vector3(-width / 2 + .5f + tile.tileX, 2, -height / 2 + .5f + tile.tileY);
   }

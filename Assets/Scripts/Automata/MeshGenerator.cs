@@ -13,10 +13,16 @@ public class MeshGenerator : MonoBehaviour {
   List<Vector3> vertices;
   List<int> triangles;
 
-  Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
+  Dictionary<int, List<Triangle>> triangleDictionary = 
+    new Dictionary<int, List<Triangle>>();
   List<List<int>> outlines = new List<List<int>>();
   HashSet<int> checkedVertices = new HashSet<int>();
 
+  /// <summary>
+  /// Generate the map mesh
+  /// </summary>
+  /// <param name="map"> An array with the </param>
+  /// <param name="squareSize"> Size of the squares that form the mesh </param>
   public void GenerateMesh(int[,] map, float squareSize) {
 
     triangleDictionary.Clear();
@@ -65,7 +71,9 @@ public class MeshGenerator : MonoBehaviour {
   }
 
 
-
+  /// <summary>
+  /// Generate the inside wall in 3D mode
+  /// </summary>
   void CreateWallMesh() {
 
     CalculateMeshOutlines();
@@ -107,7 +115,12 @@ public class MeshGenerator : MonoBehaviour {
   }
 
 
-  //params = unknow array number, you can send many params to the function, see above
+  /// <summary>
+  /// Given a certain number of points generate a mesh
+  /// </summary>
+  /// <param name="points"> points to generate the mesh. 
+  /// params = unknow array number, you can send many params to the function, see above 
+  /// </param>
   void MeshFromPoints(params Node[] points) {
     AssignVertices(points);
 
@@ -123,17 +136,23 @@ public class MeshGenerator : MonoBehaviour {
 
   }
 
+  /// <summary>
+  /// Assign an index for the vertices
+  /// </summary>
+  /// <param name="points"> Array of points </param>
   void AssignVertices(Node[] points) {
     for (int i = 0; i < points.Length; i++) {
       if (points[i].vertexIndex == -1) {
-        points[i].vertexIndex = vertices.Count; //index 0,1,2...
+        points[i].vertexIndex = vertices.Count; //index 0, 4...
         vertices.Add(points[i].position); // the vertexIndex will be used in this list
       }
     }
   }
 
   //------------------------------------OUTLINE-------------------------------------
-
+  /// <summary>
+  /// Calculate the outline of the inside part of the map
+  /// </summary>
   void CalculateMeshOutlines() {
     for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) {
       if (!checkedVertices.Contains(vertexIndex)) {
@@ -141,7 +160,7 @@ public class MeshGenerator : MonoBehaviour {
         if (newOutlineVertex != -1) {
           checkedVertices.Add(vertexIndex);
 
-          List<int> newOutline = new List<int> { vertexIndex};
+          List<int> newOutline = new List<int> { vertexIndex };
           outlines.Add(newOutline);
           FollowOutline(newOutlineVertex, outlines.Count - 1);
           outlines[outlines.Count - 1].Add(vertexIndex);
@@ -149,7 +168,12 @@ public class MeshGenerator : MonoBehaviour {
       }
     }
   }
-  //follow the vertices line recursively and adding them to outlines list
+
+  /// <summary>
+  /// follow the vertices line recursively and adding them to outlines list
+  /// </summary>
+  /// <param name="vertexIndex"> new outline vertex </param>
+  /// <param name="outlineIndex"> outline index </param>
   void FollowOutline(int vertexIndex, int outlineIndex) {
     outlines[outlineIndex].Add(vertexIndex);
     checkedVertices.Add(vertexIndex);
@@ -159,7 +183,12 @@ public class MeshGenerator : MonoBehaviour {
       FollowOutline(nextVertexIndex, outlineIndex);
     }
   }
-  //follow the edge line
+
+  /// <summary>
+  /// Given a vertex, follow its edge line
+  /// </summary>
+  /// <param name="vertexIndex"> Index of the vertex to be checked </param>
+  /// <returns> return the vertex that connects the two triangles </returns>
   int GetConnectedOutlineVertex(int vertexIndex) {
     List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
 
@@ -179,7 +208,12 @@ public class MeshGenerator : MonoBehaviour {
     return -1;
   }
 
-  //if vertexA and vertexB share only one triangle it is a outline edge
+  /// <summary>
+  /// Given two vertex return if they are in the outline
+  /// </summary>
+  /// <param name="vertexA"> First vertex to be compared </param>
+  /// <param name="vertexB"> Second vertex to be compared </param>
+  /// <returns> True if is outline or false if are not</returns>
   bool IsOutlineEdge(int vertexA, int vertexB) {
     List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
     int sharedTriangleCount = 0;
@@ -220,7 +254,11 @@ public class MeshGenerator : MonoBehaviour {
       }
     }
 
-
+    /// <summary>
+    /// Check if this triangle contains a given vertex
+    /// </summary>
+    /// <param name="vertexIndex"> Vertex to check </param>
+    /// <returns> True if the triangle contains the vertex </returns>
     public bool Contains(int vertexIndex) {
       return vertexIndex == vertexIndexA || 
         vertexIndex == vertexIndexB || 
@@ -228,6 +266,12 @@ public class MeshGenerator : MonoBehaviour {
     }
   }
 
+  /// <summary>
+  /// Create a triangle given three nodes
+  /// </summary>
+  /// <param name="a"> First node </param>
+  /// <param name="b"> Second node </param>
+  /// <param name="c"> Third node </param>
   void CreateTriangle(Node a, Node b, Node c) {
     triangles.Add(a.vertexIndex);
     triangles.Add(b.vertexIndex);
@@ -239,6 +283,11 @@ public class MeshGenerator : MonoBehaviour {
     AddTriangleToDictionary(triangle.vertexIndexC, triangle);
   }
 
+  /// <summary>
+  /// Add triangles into the dictionary that will be use to create the mesh
+  /// </summary>
+  /// <param name="vertexIndexKey"> Index of the dictionary </param>
+  /// <param name="triangle"> Triangle to add </param>
   void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle) {
     if (triangleDictionary.ContainsKey(vertexIndexKey)) {
       triangleDictionary[vertexIndexKey].Add(triangle);
@@ -326,6 +375,10 @@ O--o--O
     }
   }
 
+  /// <summary>
+  /// Depending on the configuration of the square genrate a different mesh
+  /// </summary>
+  /// <param name="square"> Square to transform </param>
   void TriangulateSquare(Square square) {
     switch (square.configuration) {
       case 0:
@@ -417,7 +470,9 @@ O--o--O
   }
 
 
-
+  /// <summary>
+  /// Generate the outline colliders for the 2D map
+  /// </summary>
   void GenerateMesh2DColliders() {
 
     EdgeCollider2D[] currentColliders = gameObject.GetComponents<EdgeCollider2D>();
