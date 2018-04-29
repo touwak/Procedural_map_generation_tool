@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
       Destroy(gameObject);
     }
 
-    DontDestroyOnLoad(gameObject);
+    //DontDestroyOnLoad(gameObject);
 		
 		enemies = new List<Enemy>();
     boardScript = GetComponent<BoardManager>();
