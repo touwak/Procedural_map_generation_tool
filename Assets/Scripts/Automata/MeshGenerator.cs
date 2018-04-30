@@ -8,8 +8,10 @@ public class MeshGenerator : MonoBehaviour {
   public MeshFilter walls;
   public MeshFilter cave;
   public bool is2D;
-  MeshCollider wallCollider;
+  public Camera camera2D;
+  public Camera camera3D;
 
+  MeshCollider wallCollider;
   List<Vector3> vertices;
   List<int> triangles;
 
@@ -48,6 +50,17 @@ public class MeshGenerator : MonoBehaviour {
     mesh.triangles = triangles.ToArray();
     mesh.RecalculateNormals();
 
+    if (is2D) {
+      camera3D.gameObject.SetActive(false);
+      camera2D.gameObject.SetActive(true);
+      cave.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+    }
+    else {
+      camera2D.gameObject.SetActive(false);
+      camera3D.gameObject.SetActive(true);
+      cave.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+    }
+
     //-------Texture---------
     int tileAmount = 10;
     Vector2[] uvs = new Vector2[vertices.Count];
@@ -63,6 +76,10 @@ public class MeshGenerator : MonoBehaviour {
 
     //-2D-
     if (is2D) {
+      if (wallCollider != null) {
+        Destroy(wallCollider);
+        walls.mesh.Clear();
+      }     
       GenerateMesh2DColliders();
     }
     else {
